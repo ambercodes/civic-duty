@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   const AppTheme._();
@@ -23,19 +24,26 @@ class AppTheme {
       onSurface: slate,
     );
 
+    final interTextTheme = GoogleFonts.interTextTheme();
     final base = ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: offWhite,
-      fontFamily: 'Arial',
+      textTheme: interTextTheme,
     );
 
     return base.copyWith(
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: offWhite,
         foregroundColor: deepNavy,
         centerTitle: false,
         elevation: 0,
+        titleTextStyle: GoogleFonts.inter(
+          color: deepNavy,
+          fontSize: 17,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0,
+        ),
       ),
       cardTheme: CardThemeData(
         color: paper,
@@ -53,7 +61,11 @@ class AppTheme {
           minimumSize: const Size.fromHeight(48),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          textStyle: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -65,34 +77,65 @@ class AppTheme {
         ),
       ),
       textTheme: base.textTheme.copyWith(
-        displaySmall: const TextStyle(
+        displayLarge: GoogleFonts.cormorantGaramond(
           color: deepNavy,
-          fontFamily: 'Georgia',
-          fontSize: 40,
+          fontSize: 52,
           fontWeight: FontWeight.w700,
-          height: 1.08,
+          height: 1,
+          letterSpacing: 0,
         ),
-        headlineMedium: const TextStyle(
+        displaySmall: GoogleFonts.cormorantGaramond(
           color: deepNavy,
-          fontFamily: 'Georgia',
-          fontSize: 28,
+          fontSize: 44,
           fontWeight: FontWeight.w700,
-          height: 1.16,
+          height: 1.04,
+          letterSpacing: 0,
         ),
-        titleLarge: const TextStyle(
+        headlineLarge: GoogleFonts.cormorantGaramond(
           color: deepNavy,
-          fontFamily: 'Georgia',
+          fontSize: 34,
+          fontWeight: FontWeight.w700,
+          height: 1.1,
+          letterSpacing: 0,
+        ),
+        headlineMedium: GoogleFonts.cormorantGaramond(
+          color: deepNavy,
+          fontSize: 30,
+          fontWeight: FontWeight.w700,
+          height: 1.14,
+          letterSpacing: 0,
+        ),
+        titleLarge: GoogleFonts.cormorantGaramond(
+          color: deepNavy,
           fontSize: 22,
           fontWeight: FontWeight.w700,
+          height: 1.18,
+          letterSpacing: 0,
         ),
-        titleMedium: const TextStyle(
+        titleMedium: GoogleFonts.inter(
           color: deepNavy,
           fontSize: 16,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w800,
+          height: 1.3,
+          letterSpacing: 0,
         ),
-        bodyLarge: const TextStyle(color: slate, fontSize: 17, height: 1.5),
-        bodyMedium: const TextStyle(color: slate, fontSize: 15, height: 1.45),
-        labelLarge: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+        bodyLarge: GoogleFonts.inter(
+          color: slate,
+          fontSize: 17,
+          height: 1.52,
+          letterSpacing: 0,
+        ),
+        bodyMedium: GoogleFonts.inter(
+          color: slate,
+          fontSize: 15,
+          height: 1.48,
+          letterSpacing: 0,
+        ),
+        labelLarge: GoogleFonts.inter(
+          fontSize: 15,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0,
+        ),
       ),
     );
   }

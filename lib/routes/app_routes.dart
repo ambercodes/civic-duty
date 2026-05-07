@@ -4,6 +4,7 @@ import '../screens/dashboard_screen.dart';
 import '../screens/dossier_screen.dart';
 import '../screens/landing_screen.dart';
 import '../screens/ratification_screen.dart';
+import '../screens/read_confirmation_screen.dart';
 import '../screens/record_screen.dart';
 
 class AppRoutes {
@@ -12,6 +13,7 @@ class AppRoutes {
   static const landing = '/';
   static const dashboard = '/dashboard';
   static const dossier = '/dossier';
+  static const confirmReview = '/confirm-review';
   static const ratify = '/ratify';
   static const record = '/record';
 
@@ -20,6 +22,7 @@ class AppRoutes {
       landing: (_) => const LandingScreen(),
       dashboard: (_) => const DashboardScreen(),
       dossier: (_) => const DossierScreen(),
+      confirmReview: (_) => const ReadConfirmationScreen(),
       ratify: (_) => const RatificationScreen(),
       record: (_) => const RecordScreen(),
     };

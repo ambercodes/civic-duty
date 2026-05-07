@@ -61,6 +61,7 @@ class _RouteMenuButton extends StatelessWidget {
         PopupMenuItem(value: AppRoutes.landing, child: Text('Landing')),
         PopupMenuItem(value: AppRoutes.dashboard, child: Text('Dashboard')),
         PopupMenuItem(value: AppRoutes.dossier, child: Text('Dossier')),
+        PopupMenuItem(value: AppRoutes.confirmReview, child: Text('Confirm')),
         PopupMenuItem(value: AppRoutes.ratify, child: Text('Ratify')),
         PopupMenuItem(value: AppRoutes.record, child: Text('Record')),
       ],

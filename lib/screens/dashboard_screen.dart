@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../mock/mock_civic_data.dart';
 import '../routes/app_routes.dart';
+import '../utils/formatters.dart';
 import '../widgets/civic_layout.dart';
 import '../widgets/metric_card.dart';
 import '../widgets/primary_button.dart';
@@ -12,26 +14,45 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return CivicLayout(
       title: 'Dashboard',
-      subtitle:
-          'A placeholder civic pulse view for future state-level metrics.',
+      subtitle: 'A static civic pulse view built from mock participation data.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Wrap(
-            spacing: 12,
-            runSpacing: 12,
+          MetricCardGroup(
+            mobileBreakpoint: 760,
             children: [
-              SizedBox(
-                width: 260,
-                child: MetricCard(label: 'Signals', value: 'Pending'),
+              MetricCard(
+                label: 'Active dossier',
+                value: '1',
+                description: mockDossier.title,
               ),
-              SizedBox(
-                width: 260,
-                child: MetricCard(label: 'States', value: 'Pending'),
+              MetricCard(
+                label: 'Participation',
+                value: Formatters.compactNumber(
+                  mockCivicRatificationRecord.totalParticipants,
+                ),
+                description: 'Mock participants in current review.',
               ),
-              SizedBox(
-                width: 260,
-                child: MetricCard(label: 'Records', value: 'Pending'),
+              MetricCard(
+                label: 'States represented',
+                value: '${mockCivicRatificationRecord.statesRepresented}',
+                description: 'State-calibrated sample coverage.',
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const MetricCardGroup(
+            children: [
+              MetricCard(
+                label: 'Current status',
+                value: 'Review',
+                description:
+                    'The active dossier is ready for participant review.',
+              ),
+              MetricCard(
+                label: 'Record progress',
+                value: 'Static',
+                description: 'A mock CRR is available after ratification.',
               ),
             ],
           ),

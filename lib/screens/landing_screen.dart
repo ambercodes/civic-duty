@@ -13,7 +13,7 @@ class LandingScreen extends StatelessWidget {
     return CivicLayout(
       title: 'Civic Duty',
       subtitle:
-          'A neutral civic measurement framework for reviewing public signals, ratifying participation, and preserving auditable records.',
+          'An open-source civic measurement framework for reviewing public signals, confirming understanding, and preserving auditable records.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -26,25 +26,31 @@ class LandingScreen extends StatelessWidget {
           const SizedBox(height: 24),
           const _ProcessOverview(),
           const SizedBox(height: 24),
-          const Wrap(
-            spacing: 12,
-            runSpacing: 12,
+          CivicPanel(
             children: [
-              SizedBox(
-                width: 280,
-                child: MetricCard(
-                  label: 'Framework',
-                  value: '4 steps',
-                  description: 'Signal, review, ratify, and record.',
-                ),
+              Text(
+                'Open Civic Foundation',
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              SizedBox(
-                width: 280,
-                child: MetricCard(
-                  label: 'Posture',
-                  value: 'Neutral',
-                  description: 'Measures participation without persuasion.',
-                ),
+              const SizedBox(height: 8),
+              Text(
+                'This prototype uses mock data only. It demonstrates the Civic Duty flow before any authentication, database, or API layer is connected.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          const MetricCardGroup(
+            children: [
+              MetricCard(
+                label: 'Framework',
+                value: '4 steps',
+                description: 'Signal, review, ratify, and record.',
+              ),
+              MetricCard(
+                label: 'Posture',
+                value: 'Neutral',
+                description: 'Measures participation without persuasion.',
               ),
             ],
           ),
@@ -59,8 +65,8 @@ class _ProcessOverview extends StatelessWidget {
 
   static const steps = [
     ('Signal', 'Capture civic pulse indicators.'),
-    ('Review', 'Organize dossiers and evidence.'),
-    ('Ratify', 'Confirm participation by state.'),
+    ('Review', 'Organize evidence-based dossiers.'),
+    ('Ratify', 'Confirm understanding and record a position.'),
     ('Record', 'Generate public civic records.'),
   ];
 
@@ -76,7 +82,7 @@ class _ProcessOverview extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         for (final step in steps) ...[
-          Text(step.$1, style: textTheme.titleMedium),
+          Text(step.$1, style: textTheme.titleLarge),
           const SizedBox(height: 4),
           Text(step.$2, style: textTheme.bodyMedium),
           if (step != steps.last) const SizedBox(height: 14),
