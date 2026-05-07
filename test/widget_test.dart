@@ -10,14 +10,17 @@ void main() {
     expect(find.text('Civic Duty'), findsWidgets);
     expect(find.text('What Is Civic Duty?'), findsOneWidget);
     expect(find.text('How It Works'), findsOneWidget);
-    expect(find.text('Open Civic Review'), findsOneWidget);
+    expect(find.text('Open Civic Review'), findsWidgets);
+    expect(find.text('Ready to Review?'), findsOneWidget);
+    expect(find.text('Back to Top'), findsNothing);
   });
 
   testWidgets('navigates from landing to dashboard', (tester) async {
     await tester.pumpWidget(const CivicDutyApp());
 
-    await tester.ensureVisible(find.byIcon(Icons.assessment_outlined));
-    await tester.tap(find.byIcon(Icons.assessment_outlined));
+    final topReviewButton = find.byIcon(Icons.assessment_outlined).first;
+    await tester.ensureVisible(topReviewButton);
+    await tester.tap(topReviewButton);
     await tester.pumpAndSettle();
 
     expect(find.text('Civic Review Dashboard'), findsOneWidget);

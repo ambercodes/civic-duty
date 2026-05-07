@@ -5,8 +5,17 @@ import '../theme/app_theme.dart';
 import '../widgets/civic_layout.dart';
 import '../widgets/primary_button.dart';
 
-class LandingScreen extends StatelessWidget {
+class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
+
+  @override
+  State<LandingScreen> createState() => _LandingScreenState();
+}
+
+class _LandingScreenState extends State<LandingScreen> {
+  void _openCivicReview() {
+    Navigator.of(context).pushNamed(AppRoutes.dashboard);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +30,7 @@ class LandingScreen extends StatelessWidget {
           PrimaryButton(
             label: 'Open Civic Review',
             icon: Icons.assessment_outlined,
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AppRoutes.dashboard),
+            onPressed: _openCivicReview,
           ),
           const SizedBox(height: 34),
           const _WhatIsCivicDuty(),
@@ -30,8 +38,38 @@ class LandingScreen extends StatelessWidget {
           const _HowItWorks(),
           const SizedBox(height: 30),
           const _WhyThisExists(),
+          const SizedBox(height: 30),
+          _LandingActions(onOpenReview: _openCivicReview),
         ],
       ),
+    );
+  }
+}
+
+class _LandingActions extends StatelessWidget {
+  const _LandingActions({required this.onOpenReview});
+
+  final VoidCallback onOpenReview;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return CivicPanel(
+      children: [
+        Text('Ready to Review?', style: textTheme.titleLarge),
+        const SizedBox(height: 10),
+        Text(
+          'Start with the current civic review packet when you are ready.',
+          style: textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 18),
+        PrimaryButton(
+          label: 'Open Civic Review',
+          icon: Icons.assessment_outlined,
+          onPressed: onOpenReview,
+        ),
+      ],
     );
   }
 }
