@@ -13,30 +13,50 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CivicLayout(
-      title: 'Dashboard',
-      subtitle: 'A static civic pulse view built from mock participation data.',
+      title: 'Civic Review Dashboard',
+      subtitle:
+          'This page shows the current review, how many people are represented in the mock data, and what to do next.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          CivicPanel(
+            children: [
+              Text(
+                mockDossier.title,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Status: Open for Review',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'This review asks participants to read a short public packet, understand the question being reviewed, and record a position. The data shown here is mock data for the static prototype.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
           MetricCardGroup(
             mobileBreakpoint: 760,
             children: [
               MetricCard(
-                label: 'Active dossier',
-                value: '1',
-                description: mockDossier.title,
-              ),
-              MetricCard(
-                label: 'Participation',
+                label: 'Participants',
                 value: Formatters.compactNumber(
                   mockCivicRatificationRecord.totalParticipants,
                 ),
-                description: 'Mock participants in current review.',
+                description: 'People included in this mock review count.',
               ),
               MetricCard(
-                label: 'States represented',
+                label: 'States Represented',
                 value: '${mockCivicRatificationRecord.statesRepresented}',
-                description: 'State-calibrated sample coverage.',
+                description: 'States included in the current mock record.',
+              ),
+              const MetricCard(
+                label: 'Review Status',
+                value: 'Open',
+                description: 'The public review packet is ready to read.',
               ),
             ],
           ),
@@ -44,15 +64,10 @@ class DashboardScreen extends StatelessWidget {
           const MetricCardGroup(
             children: [
               MetricCard(
-                label: 'Current status',
-                value: 'Review',
+                label: 'Reading Progress',
+                value: 'Not Started',
                 description:
-                    'The active dossier is ready for participant review.',
-              ),
-              MetricCard(
-                label: 'Record progress',
-                value: 'Static',
-                description: 'A mock CRR is available after ratification.',
+                    'Start with the dossier before recording a position.',
               ),
             ],
           ),

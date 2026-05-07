@@ -8,8 +8,9 @@ void main() {
     await tester.pumpWidget(const CivicDutyApp());
 
     expect(find.text('Civic Duty'), findsWidgets);
-    expect(find.text('Signal -> Review -> Ratify -> Record'), findsOneWidget);
-    expect(find.text('Open Dashboard'), findsOneWidget);
+    expect(find.text('What Is Civic Duty?'), findsOneWidget);
+    expect(find.text('How It Works'), findsOneWidget);
+    expect(find.text('Open Civic Review'), findsOneWidget);
   });
 
   testWidgets('navigates from landing to dashboard', (tester) async {
@@ -19,7 +20,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.assessment_outlined));
     await tester.pumpAndSettle();
 
-    expect(find.text('Dashboard'), findsOneWidget);
+    expect(find.text('Civic Review Dashboard'), findsOneWidget);
     expect(find.text('Review Dossier'), findsOneWidget);
   });
 

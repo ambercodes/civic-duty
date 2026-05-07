@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../routes/app_routes.dart';
 import '../theme/app_theme.dart';
 import '../widgets/civic_layout.dart';
-import '../widgets/metric_card.dart';
 import '../widgets/primary_button.dart';
 
 class LandingScreen extends StatelessWidget {
@@ -15,48 +14,22 @@ class LandingScreen extends StatelessWidget {
       header: const _HeroHeader(),
       title: 'Civic Duty',
       subtitle:
-          'An open-source civic measurement framework for reviewing public signals, confirming understanding, and preserving auditable records.',
+          'A public civic review framework for understanding concerns, reviewing evidence, and recording measurable participation.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           PrimaryButton(
-            label: 'Open Dashboard',
+            label: 'Open Civic Review',
             icon: Icons.assessment_outlined,
             onPressed: () =>
                 Navigator.of(context).pushNamed(AppRoutes.dashboard),
           ),
           const SizedBox(height: 34),
-          const _ProcessOverview(),
+          const _WhatIsCivicDuty(),
           const SizedBox(height: 30),
-          CivicPanel(
-            children: [
-              Text(
-                'Open Civic Foundation',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'This prototype uses mock data only. It demonstrates the Civic Duty flow before any authentication, database, or API layer is connected.',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
+          const _HowItWorks(),
           const SizedBox(height: 30),
-          const MetricCardGroup(
-            spacing: 16,
-            children: [
-              MetricCard(
-                label: 'Framework',
-                value: '4 steps',
-                description: 'Signal, review, ratify, and record.',
-              ),
-              MetricCard(
-                label: 'Posture',
-                value: 'Neutral',
-                description: 'Measures participation without persuasion.',
-              ),
-            ],
-          ),
+          const _WhyThisExists(),
         ],
       ),
     );
@@ -97,14 +70,15 @@ class _HeroHeader extends StatelessWidget {
   }
 }
 
-class _ProcessOverview extends StatelessWidget {
-  const _ProcessOverview();
+class _WhatIsCivicDuty extends StatelessWidget {
+  const _WhatIsCivicDuty();
 
-  static const steps = [
-    ('Signal', 'Capture civic pulse indicators.'),
-    ('Review', 'Organize evidence-based dossiers.'),
-    ('Ratify', 'Confirm understanding and record a position.'),
-    ('Record', 'Generate public civic records.'),
+  static const items = [
+    'review organized civic concerns',
+    'read supporting evidence',
+    'confirm understanding',
+    'record a position',
+    'generate measurable public participation records',
   ];
 
   @override
@@ -113,17 +87,113 @@ class _ProcessOverview extends StatelessWidget {
 
     return CivicPanel(
       children: [
+        Text('What Is Civic Duty?', style: textTheme.titleLarge),
+        const SizedBox(height: 12),
         Text(
-          'Signal -> Review -> Ratify -> Record',
-          style: textTheme.titleLarge,
+          'Civic Duty is a public review framework. It helps people review the same material, understand what is being asked, and record participation in a measured public process.',
+          style: textTheme.bodyMedium,
         ),
-        const SizedBox(height: 18),
-        for (final step in steps) ...[
-          Text(step.$1, style: textTheme.titleLarge),
-          const SizedBox(height: 4),
-          Text(step.$2, style: textTheme.bodyMedium),
-          if (step != steps.last) const SizedBox(height: 14),
+        const SizedBox(height: 14),
+        for (final item in items) ...[
+          Text('- $item', style: textTheme.bodyMedium),
+          if (item != items.last) const SizedBox(height: 6),
         ],
+        const SizedBox(height: 14),
+        Text(
+          'The system does not replace government, courts, or elections. It exists to make public participation visible and measurable during foundational civic review.',
+          style: textTheme.bodyMedium,
+        ),
+      ],
+    );
+  }
+}
+
+class _HowItWorks extends StatelessWidget {
+  const _HowItWorks();
+
+  static const steps = [
+    (
+      '01',
+      'Open Review',
+      'A civic review is opened around a clearly defined issue.',
+    ),
+    (
+      '02',
+      'Read the Dossier',
+      'A dossier organizes the evidence, context, questions, and review boundaries into one readable packet.',
+    ),
+    (
+      '03',
+      'Confirm Understanding',
+      'Participants confirm they reviewed the material before recording a position.',
+    ),
+    (
+      '04',
+      'Record Position',
+      'Participants choose whether they ratify or do not ratify the review findings.',
+    ),
+    (
+      '05',
+      'Public Record',
+      'Participation results are compiled into a public Civic Ratification Record.',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return CivicPanel(
+      children: [
+        Text('How It Works', style: textTheme.titleLarge),
+        const SizedBox(height: 16),
+        for (final step in steps) ...[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 42,
+                child: Text(step.$1, style: textTheme.titleMedium),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(step.$2, style: textTheme.titleLarge),
+                    const SizedBox(height: 4),
+                    Text(step.$3, style: textTheme.bodyMedium),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (step != steps.last) const SizedBox(height: 18),
+        ],
+      ],
+    );
+  }
+}
+
+class _WhyThisExists extends StatelessWidget {
+  const _WhyThisExists();
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return CivicPanel(
+      children: [
+        Text('Why This Exists', style: textTheme.titleLarge),
+        const SizedBox(height: 12),
+        Text(
+          'Modern public consensus is often interpreted indirectly through media, institutions, polling, and fragmented discourse.',
+          style: textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'Civic Duty creates a transparent participation layer where people can review the same material, confirm understanding, and record a position through a structured public process.',
+          style: textTheme.bodyMedium,
+        ),
       ],
     );
   }

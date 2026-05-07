@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../mock/mock_civic_data.dart';
+import '../models/evidence_item.dart';
 import '../routes/app_routes.dart';
 import '../widgets/civic_layout.dart';
 import '../widgets/primary_button.dart';
@@ -14,52 +15,82 @@ class DossierScreen extends StatelessWidget {
 
     return CivicLayout(
       title: mockDossier.title,
-      subtitle: mockDossier.summary,
+      subtitle:
+          'This is the public review packet for the current civic review.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CivicPanel(
             children: [
-              Text('Review Details', style: textTheme.titleLarge),
+              Text('What Is This Dossier?', style: textTheme.titleLarge),
               const SizedBox(height: 12),
+              Text(
+                'This dossier is a structured review packet. It gathers the issue being reviewed, supporting evidence, participation boundaries, and the question participants are being asked to consider before recording a position.',
+                style: textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 16),
               _DetailRow(label: 'Version', value: mockDossier.version),
               _DetailRow(label: 'Date', value: mockDossier.publishedDate),
               _DetailRow(
-                label: 'Estimated reading time',
+                label: 'Reading time',
                 value: '${mockDossier.estimatedReadingMinutes} minutes',
               ),
-              const SizedBox(height: 16),
-              Text('Scope', style: textTheme.titleLarge),
-              const SizedBox(height: 8),
+            ],
+          ),
+          const SizedBox(height: 18),
+          CivicPanel(
+            children: [
+              Text('What You Are Reviewing', style: textTheme.titleLarge),
+              const SizedBox(height: 12),
+              Text(mockDossier.summary, style: textTheme.bodyMedium),
+              const SizedBox(height: 12),
               Text(mockDossier.scope, style: textTheme.bodyMedium),
             ],
           ),
           const SizedBox(height: 18),
           CivicPanel(
             children: [
-              Text('Evidence List', style: textTheme.titleLarge),
+              Text('Why This Matters', style: textTheme.titleLarge),
               const SizedBox(height: 12),
+              Text(
+                'A civic review works best when people are looking at the same material and answering the same question. The evidence below is gathered so participation can be based on shared reading instead of scattered impressions.',
+                style: textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Your role in this prototype is simple: read the packet, confirm understanding, and then record whether you ratify or do not ratify the review finding.',
+                style: textTheme.bodyMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          CivicPanel(
+            children: [
+              Text('Evidence & Reading Material', style: textTheme.titleLarge),
+              const SizedBox(height: 12),
+              Text(
+                'These static items stand in for future PDFs, data files, articles, documents, and external sources.',
+                style: textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 18),
               for (final item in mockDossier.evidenceItems) ...[
-                Text('${item.id}: ${item.title}', style: textTheme.titleMedium),
-                const SizedBox(height: 4),
-                Text(item.source, style: textTheme.bodyMedium),
-                const SizedBox(height: 4),
-                Text(item.summary, style: textTheme.bodyMedium),
+                _EvidenceCard(item: item),
                 if (item != mockDossier.evidenceItems.last)
-                  const Divider(height: 24),
+                  const SizedBox(height: 14),
               ],
             ],
           ),
           const SizedBox(height: 18),
           CivicPanel(
             children: [
-              Text('Questions Under Review', style: textTheme.titleLarge),
+              Text('Question Under Review', style: textTheme.titleLarge),
               const SizedBox(height: 12),
-              for (final question in mockDossier.questions) ...[
-                Text('- $question', style: textTheme.bodyMedium),
-                if (question != mockDossier.questions.last)
-                  const SizedBox(height: 8),
-              ],
+              Text(
+                'After reviewing the material above, participants are being asked to consider the following question:',
+                style: textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 12),
+              Text(mockDossier.questions.first, style: textTheme.titleLarge),
             ],
           ),
           const SizedBox(height: 24),
@@ -70,6 +101,51 @@ class DossierScreen extends StatelessWidget {
                 Navigator.of(context).pushNamed(AppRoutes.confirmReview),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _EvidenceCard extends StatelessWidget {
+  const _EvidenceCard({required this.item});
+
+  final EvidenceItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(item.title, style: textTheme.titleLarge),
+            const SizedBox(height: 6),
+            Text(item.source, style: textTheme.titleMedium),
+            const SizedBox(height: 12),
+            Text(item.summary, style: textTheme.bodyMedium),
+            const SizedBox(height: 10),
+            Text('Why it matters', style: textTheme.titleMedium),
+            const SizedBox(height: 4),
+            Text(item.whyItMatters, style: textTheme.bodyMedium),
+            const SizedBox(height: 14),
+            OutlinedButton.icon(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${item.actionLabel} is a static prototype action.',
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.article_outlined),
+              label: Text(item.actionLabel),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -91,7 +167,7 @@ class _DetailRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 150,
+            width: 120,
             child: Text(label, style: textTheme.titleMedium),
           ),
           Expanded(child: Text(value, style: textTheme.bodyMedium)),

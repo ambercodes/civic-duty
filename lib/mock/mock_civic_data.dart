@@ -9,21 +9,30 @@ const mockEvidenceItems = [
     title: 'Foundational Consent Review Brief',
     source: 'Civic Duty Research Desk',
     summary:
-        'Summarizes the civic question, review boundaries, and participation method for this static prototype.',
+        'Explains the purpose of the review and the participation process.',
+    whyItMatters:
+        'It gives every participant the same starting point before they decide how to respond.',
+    actionLabel: 'Read Document',
   ),
   EvidenceItem(
     id: 'EV-002',
     title: 'State Participation Baseline',
     source: 'Mock state population model',
     summary:
-        'Provides a state-calibrated baseline for measuring where participation is represented.',
+        'Shows how participation can be measured across state populations.',
+    whyItMatters:
+        'It helps show whether participation is geographically broad or concentrated in only a few places.',
+    actionLabel: 'View Data',
   ),
   EvidenceItem(
     id: 'EV-003',
     title: 'Read Confirmation Method',
     source: 'Civic Duty Process Standard',
     summary:
-        'Defines how participants confirm review before recording a ratification position.',
+        'Describes why participants confirm review before recording a position.',
+    whyItMatters:
+        'It keeps participation tied to reviewed material instead of quick reactions or unclear prompts.',
+    actionLabel: 'Review Method',
   ),
 ];
 
@@ -31,13 +40,11 @@ const mockDossier = Dossier(
   id: 'DOS-2026-001',
   title: 'Foundational Consent Civic Review',
   summary:
-      'A mock dossier demonstrating how Civic Duty organizes evidence, questions, and review status before a participant ratifies or rejects a finding.',
+      'A public review packet about foundational civic consent and how participation can be measured in a transparent way.',
   scope:
-      'This static phase covers the public civic review flow only. It does not authenticate users, submit votes, or generate permanent records.',
+      'This review asks participants to read the same material, confirm understanding, and record a position. This prototype uses mock data only and does not submit real responses.',
   questions: [
-    'Has the participant reviewed the evidence presented in this dossier?',
-    'Does the dossier provide enough structure for an informed civic position?',
-    'Should this mock finding be marked ratified for prototype demonstration?',
+    'Do you believe the evidence presented justifies continued civic review and public ratification consideration?',
   ],
   evidenceItems: mockEvidenceItems,
   version: 'v0.2.0-static',
