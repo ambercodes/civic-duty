@@ -20,7 +20,7 @@ class MetricCard extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 154),
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(22),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,

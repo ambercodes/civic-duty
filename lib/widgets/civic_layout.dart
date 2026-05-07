@@ -8,11 +8,13 @@ class CivicLayout extends StatelessWidget {
     super.key,
     required this.title,
     required this.child,
+    this.header,
     this.subtitle,
   });
 
   final String title;
   final String? subtitle;
+  final Widget? header;
   final Widget child;
 
   @override
@@ -33,6 +35,7 @@ class CivicLayout extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (header != null) ...[header!, const SizedBox(height: 30)],
                   Text(title, style: textTheme.displaySmall),
                   if (subtitle != null) ...[
                     const SizedBox(height: 12),

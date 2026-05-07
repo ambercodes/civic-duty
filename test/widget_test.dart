@@ -15,6 +15,7 @@ void main() {
   testWidgets('navigates from landing to dashboard', (tester) async {
     await tester.pumpWidget(const CivicDutyApp());
 
+    await tester.ensureVisible(find.byIcon(Icons.assessment_outlined));
     await tester.tap(find.byIcon(Icons.assessment_outlined));
     await tester.pumpAndSettle();
 

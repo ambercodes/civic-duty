@@ -47,11 +47,12 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: paper,
-        elevation: 0,
+        elevation: 0.5,
+        shadowColor: deepNavy.withValues(alpha: 0.06),
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: softGray),
+          side: BorderSide(color: softGray.withValues(alpha: 0.72)),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(

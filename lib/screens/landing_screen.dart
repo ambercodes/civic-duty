@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../routes/app_routes.dart';
+import '../theme/app_theme.dart';
 import '../widgets/civic_layout.dart';
 import '../widgets/metric_card.dart';
 import '../widgets/primary_button.dart';
@@ -11,6 +12,7 @@ class LandingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CivicLayout(
+      header: const _HeroHeader(),
       title: 'Civic Duty',
       subtitle:
           'An open-source civic measurement framework for reviewing public signals, confirming understanding, and preserving auditable records.',
@@ -23,24 +25,25 @@ class LandingScreen extends StatelessWidget {
             onPressed: () =>
                 Navigator.of(context).pushNamed(AppRoutes.dashboard),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 34),
           const _ProcessOverview(),
-          const SizedBox(height: 24),
+          const SizedBox(height: 30),
           CivicPanel(
             children: [
               Text(
                 'Open Civic Foundation',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 'This prototype uses mock data only. It demonstrates the Civic Duty flow before any authentication, database, or API layer is connected.',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 30),
           const MetricCardGroup(
+            spacing: 16,
             children: [
               MetricCard(
                 label: 'Framework',
@@ -55,6 +58,40 @@ class LandingScreen extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HeroHeader extends StatelessWidget {
+  const _HeroHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.sizeOf(context).width < 640;
+
+    return IgnorePointer(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: SizedBox(
+          width: double.infinity,
+          height: isMobile ? 190 : 300,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                'assets/images/we_the_people_hero.jpg',
+                fit: BoxFit.cover,
+                alignment: isMobile ? Alignment.centerLeft : Alignment.center,
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppTheme.offWhite.withValues(alpha: 0.08),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
