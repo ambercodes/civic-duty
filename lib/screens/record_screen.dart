@@ -31,6 +31,7 @@ class _RecordScreenState extends State<RecordScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CivicLayout(
             title: 'Civic Ratification Record',
+            showHeroHeader: true,
             child: Center(child: CircularProgressIndicator()),
           );
         }
@@ -38,6 +39,7 @@ class _RecordScreenState extends State<RecordScreen> {
         if (snapshot.hasError || !snapshot.hasData) {
           return const CivicLayout(
             title: 'Civic Ratification Record',
+            showHeroHeader: true,
             child: CivicPanel(
               children: [
                 Text(
@@ -68,6 +70,7 @@ class _RecordContent extends StatelessWidget {
       title: 'Civic Ratification Record',
       subtitle:
           'We the people of the United States have convened to review the following matters in relation to foundational consent.',
+      showHeroHeader: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../routes/app_routes.dart';
-import '../theme/app_theme.dart';
 import '../widgets/civic_layout.dart';
 import '../widgets/primary_button.dart';
 
@@ -20,7 +19,7 @@ class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
     return CivicLayout(
-      header: const _HeroHeader(),
+      header: const CivicHeroHeader(),
       title: 'Civic Duty',
       subtitle:
           'A public civic review framework for understanding concerns, reviewing evidence, and recording measurable participation.',
@@ -100,40 +99,6 @@ class _LandingActions extends StatelessWidget {
           onPressed: onOpenReview,
         ),
       ],
-    );
-  }
-}
-
-class _HeroHeader extends StatelessWidget {
-  const _HeroHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    final isMobile = MediaQuery.sizeOf(context).width < 640;
-
-    return IgnorePointer(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: SizedBox(
-          width: double.infinity,
-          height: isMobile ? 190 : 300,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.asset(
-                'assets/images/we_the_people_hero.jpg',
-                fit: BoxFit.cover,
-                alignment: isMobile ? Alignment.centerLeft : Alignment.center,
-              ),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: AppTheme.offWhite.withValues(alpha: 0.08),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

@@ -11,16 +11,20 @@ class CivicLayout extends StatelessWidget {
     required this.child,
     this.header,
     this.subtitle,
+    this.showHeroHeader = false,
   });
 
   final String title;
   final String? subtitle;
   final Widget? header;
+  final bool showHeroHeader;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final pageHeader =
+        header ?? (showHeroHeader ? const CivicHeroHeader() : null);
 
     return Scaffold(
       appBar: AppBar(
@@ -36,7 +40,10 @@ class CivicLayout extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (header != null) ...[header!, const SizedBox(height: 30)],
+                  if (pageHeader != null) ...[
+                    pageHeader,
+                    const SizedBox(height: 30),
+                  ],
                   Text(title, style: textTheme.displaySmall),
                   if (subtitle != null) ...[
                     const SizedBox(height: 12),
@@ -47,6 +54,40 @@ class CivicLayout extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CivicHeroHeader extends StatelessWidget {
+  const CivicHeroHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.sizeOf(context).width < 640;
+
+    return IgnorePointer(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: SizedBox(
+          width: double.infinity,
+          height: isMobile ? 190 : 300,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                'assets/images/we_the_people_hero.jpg',
+                fit: BoxFit.cover,
+                alignment: isMobile ? Alignment.centerLeft : Alignment.center,
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppTheme.offWhite.withValues(alpha: 0.08),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -91,11 +132,11 @@ class _RouteMenuButton extends StatelessWidget {
         PopupMenuItem(value: AppRoutes.concerns, child: Text('Concerns')),
         PopupMenuItem(
           value: AppRoutes.submitConcern,
-          child: Text('Submit Concern'),
+          child: Text('Submit a Concern'),
         ),
         PopupMenuItem(
           value: AppRoutes.concernArchive,
-          child: Text('Concern Archive'),
+          child: Text('Concern Archives'),
         ),
         PopupMenuDivider(),
         PopupMenuItem(

@@ -59,8 +59,9 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return CivicLayout(
-      title: 'Create Account',
+      title: 'Sign Up',
       subtitle: 'Create an account before civic participation.',
+      showHeroHeader: true,
       child: CivicPanel(
         children: [
           Form(

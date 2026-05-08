@@ -123,14 +123,16 @@ class _SubmitConcernScreenState extends State<SubmitConcernScreen> {
 
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CivicLayout(
-            title: 'Submit Foundational Concern',
+            title: 'Submit a Concern',
+            showHeroHeader: true,
             child: Center(child: CircularProgressIndicator()),
           );
         }
 
         if (!canCreate) {
           return const CivicLayout(
-            title: 'Submit Foundational Concern',
+            title: 'Submit a Concern',
+            showHeroHeader: true,
             child: CivicPanel(
               children: [
                 Text(
@@ -142,9 +144,10 @@ class _SubmitConcernScreenState extends State<SubmitConcernScreen> {
         }
 
         return CivicLayout(
-          title: 'Submit Foundational Concern',
+          title: 'Submit a Concern',
           subtitle:
               'Prepare the concern as if it may become a public civic review dossier.',
+          showHeroHeader: true,
           child: CivicPanel(
             children: [
               Form(

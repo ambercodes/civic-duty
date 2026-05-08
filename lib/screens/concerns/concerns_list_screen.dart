@@ -23,6 +23,7 @@ class _ConcernsListScreenState extends State<ConcernsListScreen> {
       title: 'Foundational Concerns',
       subtitle:
           'A foundational concern is a structured issue submitted for possible civic review.',
+      showHeroHeader: true,
       child: FutureBuilder<List<FoundationalConcern>>(
         future: _concernsFuture,
         builder: (context, snapshot) {

@@ -11,9 +11,10 @@ class ConcernArchiveScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CivicLayout(
-      title: 'Concern Archive',
+      title: 'Concern Archives',
       subtitle:
           'Archived concerns remain publicly viewable as constitutional civic memory.',
+      showHeroHeader: true,
       child: FutureBuilder<List<FoundationalConcern>>(
         future: ConcernService().listArchive(),
         builder: (context, snapshot) {

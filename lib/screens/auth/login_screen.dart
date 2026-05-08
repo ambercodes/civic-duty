@@ -61,6 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return CivicLayout(
       title: 'Log In',
       subtitle: 'Access your Civic Duty sandbox account.',
+      showHeroHeader: true,
       child: CivicPanel(
         children: [
           Form(

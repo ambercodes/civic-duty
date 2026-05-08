@@ -25,6 +25,7 @@ class EducationScreen extends StatelessWidget {
     return CivicLayout(
       title: page.title,
       subtitle: page.subtitle,
+      showHeroHeader: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

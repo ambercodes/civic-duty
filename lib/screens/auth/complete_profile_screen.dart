@@ -122,8 +122,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return CivicLayout(
-      title: 'Complete Civic Profile',
+      title: 'Civic Profile',
       subtitle: 'Participation remains locked until this profile is complete.',
+      showHeroHeader: true,
       child: CivicPanel(
         children: [
           Form(

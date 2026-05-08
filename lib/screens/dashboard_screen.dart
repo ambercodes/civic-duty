@@ -37,6 +37,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CivicLayout(
             title: 'Civic Review Dashboard',
+            showHeroHeader: true,
             child: Center(child: CircularProgressIndicator()),
           );
         }
@@ -44,6 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (snapshot.hasError || !snapshot.hasData) {
           return const CivicLayout(
             title: 'Civic Review Dashboard',
+            showHeroHeader: true,
             child: CivicPanel(
               children: [
                 Text('The dashboard could not load backend data right now.'),
@@ -60,6 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           title: 'Civic Review Dashboard',
           subtitle:
               'This page shows the current review and public backend participation record.',
+          showHeroHeader: true,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
