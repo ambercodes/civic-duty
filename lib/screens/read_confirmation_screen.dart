@@ -34,20 +34,20 @@ class _ReadConfirmationScreenState extends State<ReadConfirmationScreen> {
 
     try {
       await ParticipationService().confirmRead(widget.dossierIdOrSlug);
-      if (!mounted) {
-        return;
-      }
-      Navigator.of(
-        context,
-      ).pushNamed('${AppRoutes.ratify}/${widget.dossierIdOrSlug}');
     } catch (error) {
-      setState(() {
-        message = error.toString().contains('DUPLICATE_PARTICIPATION')
-            ? 'Review was already confirmed. Continue to ratification.'
-            : 'Read confirmation could not be saved.';
-        isSubmitting = false;
-      });
+      // Static public demos may not have a writable backend. The confirmation
+      // still acts as an in-session review gate before opening ratification.
+      if (!error.toString().contains('DUPLICATE_PARTICIPATION')) {
+        debugPrint('Read confirmation was not persisted: $error');
+      }
     }
+
+    if (!mounted) {
+      return;
+    }
+    Navigator.of(
+      context,
+    ).pushNamed('${AppRoutes.ratify}/${widget.dossierIdOrSlug}');
   }
 
   @override
