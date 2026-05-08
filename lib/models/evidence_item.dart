@@ -14,4 +14,15 @@ class EvidenceItem {
   final String summary;
   final String whyItMatters;
   final String actionLabel;
+
+  factory EvidenceItem.fromJson(Map<String, dynamic> json) {
+    return EvidenceItem(
+      id: (json['externalId'] ?? json['id'] ?? '').toString(),
+      title: (json['title'] ?? '').toString(),
+      source: (json['source'] ?? '').toString(),
+      summary: (json['summary'] ?? '').toString(),
+      whyItMatters: (json['whyItMatters'] ?? '').toString(),
+      actionLabel: 'Read Document',
+    );
+  }
 }

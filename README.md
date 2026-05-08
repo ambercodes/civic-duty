@@ -59,6 +59,7 @@ Architecture docs:
 - [Deployment Architecture](docs/deployment-architecture.md)
 - [Database Architecture](docs/database-architecture.md)
 - [Administrative Governance](docs/administrative-governance.md)
+- [Local Development](docs/local-development.md)
 - [Schema Planning](schemas/README.md)
 - [Developer Guidelines](docs/dev-guidelines.md)
 

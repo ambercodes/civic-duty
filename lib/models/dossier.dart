@@ -11,9 +11,12 @@ class Dossier {
     required this.version,
     required this.publishedDate,
     required this.estimatedReadingMinutes,
+    this.slug,
+    this.provisions = const [],
   });
 
   final String id;
+  final String? slug;
   final String title;
   final String summary;
   final String scope;
@@ -22,4 +25,55 @@ class Dossier {
   final String version;
   final String publishedDate;
   final int estimatedReadingMinutes;
+  final List<DossierProvision> provisions;
+
+  factory Dossier.fromJson(Map<String, dynamic> json) {
+    final evidence = (json['evidence'] as List<dynamic>? ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map(EvidenceItem.fromJson)
+        .toList();
+    final questions = (json['questions'] as List<dynamic>? ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map((item) => (item['text'] ?? '').toString())
+        .where((item) => item.isNotEmpty)
+        .toList();
+    final provisions = (json['provisions'] as List<dynamic>? ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map(DossierProvision.fromJson)
+        .toList();
+
+    return Dossier(
+      id: (json['id'] ?? '').toString(),
+      slug: json['slug']?.toString(),
+      title: (json['title'] ?? '').toString(),
+      summary: (json['summary'] ?? '').toString(),
+      scope: (json['scope'] ?? '').toString(),
+      questions: questions,
+      evidenceItems: evidence,
+      version: (json['version'] ?? '').toString(),
+      publishedDate: (json['publishedAt'] ?? '').toString(),
+      estimatedReadingMinutes: 6,
+      provisions: provisions,
+    );
+  }
+}
+
+class DossierProvision {
+  const DossierProvision({
+    required this.id,
+    required this.slug,
+    required this.text,
+  });
+
+  final String id;
+  final String slug;
+  final String text;
+
+  factory DossierProvision.fromJson(Map<String, dynamic> json) {
+    return DossierProvision(
+      id: (json['id'] ?? '').toString(),
+      slug: (json['slug'] ?? '').toString(),
+      text: (json['text'] ?? '').toString(),
+    );
+  }
 }

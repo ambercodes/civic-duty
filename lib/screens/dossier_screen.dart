@@ -2,19 +2,47 @@ import 'package:flutter/material.dart';
 
 import '../mock/mock_civic_data.dart';
 import '../models/evidence_item.dart';
+import '../models/dossier.dart';
 import '../routes/app_routes.dart';
+import '../services/dossier_service.dart';
 import '../widgets/civic_layout.dart';
 import '../widgets/primary_button.dart';
 
-class DossierScreen extends StatelessWidget {
+class DossierScreen extends StatefulWidget {
   const DossierScreen({super.key});
+
+  @override
+  State<DossierScreen> createState() => _DossierScreenState();
+}
+
+class _DossierScreenState extends State<DossierScreen> {
+  late final Future<Dossier> _dossierFuture = DossierService()
+      .getDossier('foundational-consent-civic-review')
+      .catchError((_) => mockDossier);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Dossier>(
+      future: _dossierFuture,
+      builder: (context, snapshot) {
+        final dossier = snapshot.data ?? mockDossier;
+        return _DossierContent(dossier: dossier);
+      },
+    );
+  }
+}
+
+class _DossierContent extends StatelessWidget {
+  const _DossierContent({required this.dossier});
+
+  final Dossier dossier;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
     return CivicLayout(
-      title: mockDossier.title,
+      title: dossier.title,
       subtitle:
           'This is the public review packet for the current civic review.',
       child: Column(
@@ -29,11 +57,11 @@ class DossierScreen extends StatelessWidget {
                 style: textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
-              _DetailRow(label: 'Version', value: mockDossier.version),
-              _DetailRow(label: 'Date', value: mockDossier.publishedDate),
+              _DetailRow(label: 'Version', value: dossier.version),
+              _DetailRow(label: 'Date', value: dossier.publishedDate),
               _DetailRow(
                 label: 'Reading time',
-                value: '${mockDossier.estimatedReadingMinutes} minutes',
+                value: '${dossier.estimatedReadingMinutes} minutes',
               ),
             ],
           ),
@@ -42,9 +70,9 @@ class DossierScreen extends StatelessWidget {
             children: [
               Text('What You Are Reviewing', style: textTheme.titleLarge),
               const SizedBox(height: 12),
-              Text(mockDossier.summary, style: textTheme.bodyMedium),
+              Text(dossier.summary, style: textTheme.bodyMedium),
               const SizedBox(height: 12),
-              Text(mockDossier.scope, style: textTheme.bodyMedium),
+              Text(dossier.scope, style: textTheme.bodyMedium),
             ],
           ),
           const SizedBox(height: 18),
@@ -73,9 +101,9 @@ class DossierScreen extends StatelessWidget {
                 style: textTheme.bodyMedium,
               ),
               const SizedBox(height: 18),
-              for (final item in mockDossier.evidenceItems) ...[
+              for (final item in dossier.evidenceItems) ...[
                 _EvidenceCard(item: item),
-                if (item != mockDossier.evidenceItems.last)
+                if (item != dossier.evidenceItems.last)
                   const SizedBox(height: 14),
               ],
             ],
@@ -90,7 +118,7 @@ class DossierScreen extends StatelessWidget {
                 style: textTheme.bodyMedium,
               ),
               const SizedBox(height: 12),
-              Text(mockDossier.questions.first, style: textTheme.titleLarge),
+              Text(dossier.questions.first, style: textTheme.titleLarge),
             ],
           ),
           const SizedBox(height: 24),

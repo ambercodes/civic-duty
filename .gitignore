@@ -47,6 +47,7 @@ app.*.map.json
 .env
 .env.*
 *.env
+!.env.example
 
 # Firebase
 firebase_options.dart
@@ -117,6 +118,7 @@ node_modules/
 # -----------------------------
 *.sql
 *.dump
+!schemas/**/*.sql
 
 # -----------------------------
 # Archive files

@@ -1,13 +1,41 @@
 import 'package:flutter/material.dart';
 
 import '../mock/mock_civic_data.dart';
+import '../models/civic_ratification_record.dart';
 import '../routes/app_routes.dart';
+import '../services/crr_service.dart';
 import '../utils/formatters.dart';
 import '../widgets/civic_layout.dart';
 import '../widgets/primary_button.dart';
 
-class RecordScreen extends StatelessWidget {
+class RecordScreen extends StatefulWidget {
   const RecordScreen({super.key});
+
+  @override
+  State<RecordScreen> createState() => _RecordScreenState();
+}
+
+class _RecordScreenState extends State<RecordScreen> {
+  late final Future<CivicRatificationRecord> _recordFuture = CrrService()
+      .getRecord('foundational-consent-civic-review-sandbox-record')
+      .catchError((_) => mockCivicRatificationRecord);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<CivicRatificationRecord>(
+      future: _recordFuture,
+      builder: (context, snapshot) {
+        final record = snapshot.data ?? mockCivicRatificationRecord;
+        return _RecordContent(record: record);
+      },
+    );
+  }
+}
+
+class _RecordContent extends StatelessWidget {
+  const _RecordContent({required this.record});
+
+  final CivicRatificationRecord record;
 
   @override
   Widget build(BuildContext context) {
@@ -24,22 +52,13 @@ class RecordScreen extends StatelessWidget {
             children: [
               Text('Record Identity', style: textTheme.titleLarge),
               const SizedBox(height: 12),
-              _RecordLine(
-                label: 'Record ID',
-                value: mockCivicRatificationRecord.recordId,
-              ),
-              _RecordLine(
-                label: 'Version',
-                value: mockCivicRatificationRecord.version,
-              ),
+              _RecordLine(label: 'Record ID', value: record.recordId),
+              _RecordLine(label: 'Version', value: record.version),
               _RecordLine(
                 label: 'Publication date',
-                value: mockCivicRatificationRecord.publicationDate,
+                value: record.publicationDate,
               ),
-              _RecordLine(
-                label: 'Dossier',
-                value: mockCivicRatificationRecord.dossier.title,
-              ),
+              _RecordLine(label: 'Dossier', value: record.dossier.title),
             ],
           ),
           const SizedBox(height: 18),
@@ -49,25 +68,19 @@ class RecordScreen extends StatelessWidget {
               const SizedBox(height: 12),
               _RecordLine(
                 label: 'Total participants',
-                value: Formatters.compactNumber(
-                  mockCivicRatificationRecord.totalParticipants,
-                ),
+                value: Formatters.compactNumber(record.totalParticipants),
               ),
               _RecordLine(
                 label: 'Ratified',
-                value: Formatters.compactNumber(
-                  mockCivicRatificationRecord.ratifiedCount,
-                ),
+                value: Formatters.compactNumber(record.ratifiedCount),
               ),
               _RecordLine(
                 label: 'Not ratified',
-                value: Formatters.compactNumber(
-                  mockCivicRatificationRecord.notRatifiedCount,
-                ),
+                value: Formatters.compactNumber(record.notRatifiedCount),
               ),
               _RecordLine(
                 label: 'States represented',
-                value: '${mockCivicRatificationRecord.statesRepresented}',
+                value: '${record.statesRepresented}',
               ),
             ],
           ),
@@ -85,8 +98,7 @@ class RecordScreen extends StatelessWidget {
                     DataColumn(label: Text('Coverage')),
                   ],
                   rows: [
-                    for (final pulse
-                        in mockCivicRatificationRecord.stateParticipation)
+                    for (final pulse in record.stateParticipation)
                       DataRow(
                         cells: [
                           DataCell(Text(pulse.state)),
@@ -122,17 +134,11 @@ class RecordScreen extends StatelessWidget {
             children: [
               Text('Ratification Outcome', style: textTheme.titleLarge),
               const SizedBox(height: 8),
-              Text(
-                mockCivicRatificationRecord.outcome,
-                style: textTheme.bodyMedium,
-              ),
+              Text(record.outcome, style: textTheme.bodyMedium),
               const SizedBox(height: 18),
               Text('Methodology', style: textTheme.titleLarge),
               const SizedBox(height: 8),
-              Text(
-                mockCivicRatificationRecord.methodology,
-                style: textTheme.bodyMedium,
-              ),
+              Text(record.methodology, style: textTheme.bodyMedium),
             ],
           ),
           const SizedBox(height: 24),

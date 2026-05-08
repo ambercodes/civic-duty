@@ -33,6 +33,8 @@ class _LandingScreenState extends State<LandingScreen> {
             onPressed: _openCivicReview,
           ),
           const SizedBox(height: 34),
+          const _SandboxDisclaimer(),
+          const SizedBox(height: 30),
           const _WhatIsCivicDuty(),
           const SizedBox(height: 30),
           const _HowItWorks(),
@@ -42,6 +44,34 @@ class _LandingScreenState extends State<LandingScreen> {
           _LandingActions(onOpenReview: _openCivicReview),
         ],
       ),
+    );
+  }
+}
+
+class _SandboxDisclaimer extends StatelessWidget {
+  const _SandboxDisclaimer();
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return CivicPanel(
+      children: [
+        Text(
+          'Civic Duty Constitutional Review Sandbox',
+          style: textTheme.titleLarge,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'This is a public civic review demonstration environment intended for constitutional review experimentation, methodology visibility, and participation flow testing.',
+          style: textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'The sandbox does not constitute governmental authority, legal adjudication, binding constitutional interpretation, or official public policy determination.',
+          style: textTheme.bodyMedium,
+        ),
+      ],
     );
   }
 }
