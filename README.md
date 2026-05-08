@@ -20,6 +20,10 @@ Signal -> Review -> Ratify -> Record
 
 View the Civic Duty Constitutional Review Sandbox:
 
+[Open the live demo](https://civic-duty-sandbox.web.app)
+
+Copyable URL:
+
 ```text
 https://civic-duty-sandbox.web.app
 ```
