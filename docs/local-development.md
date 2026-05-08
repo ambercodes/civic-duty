@@ -38,7 +38,9 @@ FIREBASE_APP_ID=...
 
 Do not commit real `.env` files or database URLs.
 
-For Firebase Functions local runs, export the variables in the shell that starts the emulator:
+For Firebase Functions local runs, the emulator can read the repo-root `.env`
+file. If you prefer shell-managed variables, export them in the shell that
+starts the emulator:
 
 ```sh
 export APP_ENV=sandbox
@@ -122,11 +124,14 @@ curl \
 
 ## Flutter Development
 
-Run the web app against Firebase Hosting rewrites:
+When using `flutter run`, point the app directly at the Functions emulator.
+The Flutter dev server does not apply Firebase Hosting rewrites, so
+`API_BASE_URL=/api` will try to call the Flutter localhost port instead of the
+API.
 
 ```sh
 flutter run -d chrome \
-  --dart-define=API_BASE_URL=/api \
+  --dart-define=API_BASE_URL=http://127.0.0.1:5001/civic-duty-sandbox/us-central1/api/api \
   --dart-define=FIREBASE_API_KEY="$FIREBASE_API_KEY" \
   --dart-define=FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN" \
   --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" \
@@ -135,12 +140,26 @@ flutter run -d chrome \
   --dart-define=FIREBASE_APP_ID="$FIREBASE_APP_ID"
 ```
 
+Use `API_BASE_URL=/api` only when the app is served through Firebase Hosting,
+including deployed Hosting or the Hosting emulator serving `build/web`.
+
 If calling a deployed API directly:
 
 ```sh
 flutter run -d chrome \
   --dart-define=API_BASE_URL=https://us-central1-civic-duty-sandbox.cloudfunctions.net/api/api
 ```
+
+## Neon Connection Check
+
+If `psql` is not installed locally, use the repo-local Node check instead:
+
+```sh
+node scripts/check_neon_connection.mjs
+```
+
+The script reads `.env`, prints only non-secret connection metadata, and checks
+the seeded dossier count.
 
 ## Validation Commands
 

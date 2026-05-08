@@ -201,8 +201,11 @@ class _RatificationContent extends StatelessWidget {
                   if (provisionResponses[provision.id] != null)
                     provisionResponses[provision.id]!,
                 },
-                emptySelectionAllowed: false,
+                emptySelectionAllowed: true,
                 onSelectionChanged: (selection) {
+                  if (selection.isEmpty) {
+                    return;
+                  }
                   onSelectProvision(provision.id, selection.first);
                 },
               ),

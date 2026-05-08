@@ -1,17 +1,69 @@
+import {existsSync, readFileSync} from "node:fs";
+import {resolve} from "node:path";
 import {initializeApp} from "firebase-admin/app";
 import {getAuth} from "firebase-admin/auth";
 import {setGlobalOptions} from "firebase-functions";
 import {onRequest} from "firebase-functions/https";
 import {Pool} from "pg";
 
+function loadLocalEnv() {
+  const candidates = [
+    resolve(process.cwd(), ".env"),
+    resolve(process.cwd(), "..", ".env"),
+  ];
+  const envPath = candidates.find((candidate) => existsSync(candidate));
+  if (!envPath) {
+    return;
+  }
+
+  const lines = readFileSync(envPath, "utf8").split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) {
+      continue;
+    }
+
+    const separator = trimmed.indexOf("=");
+    if (separator === -1) {
+      continue;
+    }
+
+    const key = trimmed.substring(0, separator).trim();
+    const rawValue = trimmed.substring(separator + 1).trim();
+    const value = rawValue.replace(/^['"]|['"]$/g, "");
+    if (key && process.env[key] === undefined) {
+      process.env[key] = value;
+    }
+  }
+}
+
+loadLocalEnv();
+
 initializeApp();
 setGlobalOptions({maxInstances: 10});
 
+function databaseUrl() {
+  const raw = process.env.NEON_DATABASE_URL;
+  if (!raw) {
+    return undefined;
+  }
+
+  try {
+    const url = new URL(raw);
+    url.searchParams.delete("channel_binding");
+    if (!url.searchParams.has("sslmode")) {
+      url.searchParams.set("sslmode", "require");
+    }
+    return url.toString();
+  } catch {
+    return raw;
+  }
+}
+
 const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL,
-  ssl: process.env.APP_ENV === "sandbox" ?
-    {rejectUnauthorized: false} :
-    undefined,
+  connectionString: databaseUrl(),
+  connectionTimeoutMillis: 15000,
+  keepAlive: true,
 });
 
 const writeAttempts = new Map<string, number[]>();
