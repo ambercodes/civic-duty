@@ -29,6 +29,11 @@ APP_ENV=sandbox
 FIREBASE_PROJECT_ID=civic-duty-sandbox
 API_BASE_URL=/api
 NEON_DATABASE_URL=postgresql://...
+FIREBASE_API_KEY=...
+FIREBASE_AUTH_DOMAIN=civic-duty-sandbox.firebaseapp.com
+FIREBASE_STORAGE_BUCKET=...
+FIREBASE_MESSAGING_SENDER_ID=...
+FIREBASE_APP_ID=...
 ```
 
 Do not commit real `.env` files or database URLs.
@@ -47,6 +52,7 @@ Run the Phase 4 schema against Neon:
 
 ```sh
 psql "$NEON_DATABASE_URL" -f schemas/001_phase4_core.sql
+psql "$NEON_DATABASE_URL" -f schemas/002_phase5_users.sql
 ```
 
 Seed sandbox data:
@@ -118,7 +124,14 @@ curl \
 Run the web app against Firebase Hosting rewrites:
 
 ```sh
-flutter run -d chrome --dart-define=API_BASE_URL=/api
+flutter run -d chrome \
+  --dart-define=API_BASE_URL=/api \
+  --dart-define=FIREBASE_API_KEY="$FIREBASE_API_KEY" \
+  --dart-define=FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN" \
+  --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" \
+  --dart-define=FIREBASE_STORAGE_BUCKET="$FIREBASE_STORAGE_BUCKET" \
+  --dart-define=FIREBASE_MESSAGING_SENDER_ID="$FIREBASE_MESSAGING_SENDER_ID" \
+  --dart-define=FIREBASE_APP_ID="$FIREBASE_APP_ID"
 ```
 
 If calling a deployed API directly:
@@ -160,7 +173,14 @@ npm --prefix functions run build
 Build Flutter Web:
 
 ```sh
-flutter build web --dart-define=API_BASE_URL=/api
+flutter build web \
+  --dart-define=API_BASE_URL=/api \
+  --dart-define=FIREBASE_API_KEY="$FIREBASE_API_KEY" \
+  --dart-define=FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN" \
+  --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" \
+  --dart-define=FIREBASE_STORAGE_BUCKET="$FIREBASE_STORAGE_BUCKET" \
+  --dart-define=FIREBASE_MESSAGING_SENDER_ID="$FIREBASE_MESSAGING_SENDER_ID" \
+  --dart-define=FIREBASE_APP_ID="$FIREBASE_APP_ID"
 ```
 
 Deploy Functions and Hosting:

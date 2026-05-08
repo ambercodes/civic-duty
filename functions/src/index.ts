@@ -14,6 +14,10 @@ const pool = new Pool({
     undefined,
 });
 
+const writeAttempts = new Map<string, number[]>();
+const writeLimitWindowMs = 60 * 1000;
+const writeLimitMaxAttempts = 20;
+
 type ApiMeta = {
   requestId: string;
   version: string;
@@ -46,6 +50,7 @@ type ApiErrorCode =
   "CRR_NOT_FOUND" |
   "PROVISION_NOT_FOUND" |
   "VALIDATION_FAILED" |
+  "RATE_LIMITED" |
   "METHOD_NOT_ALLOWED" |
   "SERVER_ERROR";
 
@@ -60,6 +65,8 @@ type UserRow = {
   firebase_uid: string;
   email: string;
   email_verified: boolean;
+  display_alias: string | null;
+  birth_year: number | null;
   date_of_birth: string | null;
   is_18_plus: boolean;
   state_code: string | null;
@@ -164,6 +171,27 @@ function routePath(path: string): string {
   return path.startsWith("/api") ? path.slice(4) || "/health" : path;
 }
 
+function clientKey(request: RequestLike): string {
+  const forwarded = request.headers["x-forwarded-for"];
+  const value = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+  return value?.split(",")[0]?.trim() || "unknown";
+}
+
+function rateLimitWrite(request: RequestLike): boolean {
+  const key = clientKey(request);
+  const now = Date.now();
+  const recent = (writeAttempts.get(key) || [])
+    .filter((timestamp) => now - timestamp < writeLimitWindowMs);
+  if (recent.length >= writeLimitMaxAttempts) {
+    writeAttempts.set(key, recent);
+    return false;
+  }
+
+  recent.push(now);
+  writeAttempts.set(key, recent);
+  return true;
+}
+
 function bodyValue(body: unknown, key: string): unknown {
   if (typeof body !== "object" || body === null) {
     return undefined;
@@ -200,6 +228,11 @@ function isAdult(dateOfBirth: string): boolean {
   }
 
   return age >= 18;
+}
+
+function isAdultBirthYear(birthYear: number): boolean {
+  const currentYear = new Date().getUTCFullYear();
+  return currentYear - birthYear >= 18;
 }
 
 async function verifyAuth(request: RequestLike): Promise<AuthContext> {
@@ -296,6 +329,8 @@ function serializeUser(user: UserRow) {
     firebaseUid: user.firebase_uid,
     email: user.email,
     emailVerified: user.email_verified,
+    displayAlias: user.display_alias,
+    birthYear: user.birth_year,
     dateOfBirth: user.date_of_birth,
     is18Plus: user.is_18_plus,
     stateCode: user.state_code,
@@ -391,28 +426,66 @@ async function listDossiers() {
 }
 
 async function serializeRecord(record: RecordRow) {
-  const [stateResults, verificationSummary, provisionResults, totals] =
+  const [
+    stateResults,
+    verificationSummary,
+    provisionResults,
+    totals,
+    evidenceIndex,
+  ] =
     await Promise.all([
       pool.query(
-        `select *
-         from crr_state_results
-         where crr_id = $1
-         order by state_code`,
-        [record.id],
+        `select
+           baseline.state_code,
+           baseline.state_name,
+           count(ratifications.id)::int as participants,
+           baseline.citizen_voting_age_population,
+           case
+             when baseline.citizen_voting_age_population = 0 then 0
+             else count(ratifications.id)::numeric /
+               baseline.citizen_voting_age_population
+           end as participation_rate
+         from state_population_baselines baseline
+         left join ratifications
+           on ratifications.state_at_participation = baseline.state_code
+          and ratifications.dossier_id = $1
+         group by baseline.state_code,
+           baseline.state_name,
+           baseline.citizen_voting_age_population
+         order by baseline.state_code`,
+        [record.dossier_id],
       ),
       pool.query(
-        `select *
-         from crr_verification_summary
-         where crr_id = $1
-         order by verification_level`,
-        [record.id],
+        `select
+           verification_level_at_participation as verification_level,
+           count(*)::int as participant_count,
+           case
+             when count(*) over () = 0 then 0
+             else count(*)::numeric / sum(count(*)) over () * 100
+           end as percentage
+         from ratifications
+         where dossier_id = $1
+         group by verification_level_at_participation
+         order by verification_level_at_participation`,
+        [record.dossier_id],
       ),
       pool.query(
-        `select *
-         from crr_provision_results
-         where crr_id = $1
-         order by id`,
-        [record.id],
+        `select
+           dossier_provisions.id as provision_id,
+           dossier_provisions.provision_text,
+           count(provision_responses.id)
+             filter (where provision_responses.position = 'agree')::int
+             as agree_count,
+           count(provision_responses.id)
+             filter (where provision_responses.position = 'disagree')::int
+             as disagree_count
+         from dossier_provisions
+         left join provision_responses
+           on provision_responses.provision_id = dossier_provisions.id
+         where dossier_provisions.dossier_id = $1
+         group by dossier_provisions.id, dossier_provisions.provision_text
+         order by dossier_provisions.display_order`,
+        [record.dossier_id],
       ),
       pool.query(
         `select
@@ -423,6 +496,13 @@ async function serializeRecord(record: RecordRow) {
            count(distinct state_at_participation)::int as states_represented
          from ratifications
          where dossier_id = $1`,
+        [record.dossier_id],
+      ),
+      pool.query<EvidenceRow>(
+        `select *
+         from dossier_evidence
+         where dossier_id = $1
+         order by display_order, title`,
         [record.dossier_id],
       ),
     ]);
@@ -444,6 +524,16 @@ async function serializeRecord(record: RecordRow) {
     stateResults: stateResults.rows,
     verificationSummary: verificationSummary.rows,
     provisionResults: provisionResults.rows,
+    evidenceIndex: evidenceIndex.rows.map((item) => ({
+      id: item.id,
+      externalId: item.external_id,
+      title: item.title,
+      source: item.source,
+      summary: item.summary,
+      whyItMatters: item.why_it_matters,
+      url: item.url,
+      displayOrder: item.display_order,
+    })),
   };
 }
 
@@ -485,19 +575,28 @@ async function updateProfile(
     throw error;
   }
 
+  const displayAlias = bodyValue(request.body, "displayAlias");
+  const birthYearValue = bodyValue(request.body, "birthYear");
   const dateOfBirth = bodyValue(request.body, "dateOfBirth");
   const citizenshipAttested = bodyValue(request.body, "citizenshipAttested");
   const stateCode = normalizeState(bodyValue(request.body, "stateCode"));
+  const birthYear = typeof birthYearValue === "number" ?
+    birthYearValue :
+    Number.parseInt(String(birthYearValue || ""), 10);
 
-  if (!isString(dateOfBirth) ||
+  if (!isString(displayAlias) ||
+    Number.isNaN(birthYear) ||
     typeof citizenshipAttested !== "boolean" ||
     stateCode === null) {
     sendError(response, 400, "VALIDATION_FAILED",
-      "dateOfBirth, stateCode, and citizenshipAttested are required.");
+      "displayAlias, birthYear, stateCode, and citizenshipAttested " +
+      "are required.");
     return;
   }
 
-  const is18Plus = isAdult(dateOfBirth);
+  const is18Plus = isString(dateOfBirth) ?
+    isAdult(dateOfBirth) :
+    isAdultBirthYear(birthYear);
   const completed = user.email_verified &&
     is18Plus &&
     citizenshipAttested &&
@@ -506,17 +605,28 @@ async function updateProfile(
   const result = await pool.query<UserRow>(
     `update users
      set date_of_birth = $2,
-         is_18_plus = $3,
-         state_code = $4,
-         citizenship_attested = $5,
+         display_alias = $3,
+         birth_year = $4,
+         is_18_plus = $5,
+         state_code = $6,
+         citizenship_attested = $7,
          profile_completed_at = case
-           when $6 then coalesce(profile_completed_at, now())
+           when $8 then coalesce(profile_completed_at, now())
            else null
          end,
          updated_at = now()
      where id = $1
      returning *`,
-    [user.id, dateOfBirth, is18Plus, stateCode, citizenshipAttested, completed],
+    [
+      user.id,
+      isString(dateOfBirth) ? dateOfBirth : null,
+      String(displayAlias).trim(),
+      birthYear,
+      is18Plus,
+      stateCode,
+      citizenshipAttested,
+      completed,
+    ],
   );
 
   sendOk(response, {user: serializeUser(result.rows[0])});
@@ -678,6 +788,12 @@ export const api = onRequest({cors: true}, async (request, response) => {
   const method = req.method.toUpperCase();
 
   try {
+    if (method !== "GET" && !rateLimitWrite(req)) {
+      sendError(res, 429, "RATE_LIMITED",
+        "Too many write attempts. Please wait and try again.");
+      return;
+    }
+
     if (method === "GET" && path === "/health") {
       sendOk(res, {
         status: "ok",

@@ -6,6 +6,7 @@ class EvidenceItem {
     required this.summary,
     required this.whyItMatters,
     required this.actionLabel,
+    this.url,
   });
 
   final String id;
@@ -14,6 +15,7 @@ class EvidenceItem {
   final String summary;
   final String whyItMatters;
   final String actionLabel;
+  final String? url;
 
   factory EvidenceItem.fromJson(Map<String, dynamic> json) {
     return EvidenceItem(
@@ -23,6 +25,7 @@ class EvidenceItem {
       summary: (json['summary'] ?? '').toString(),
       whyItMatters: (json['whyItMatters'] ?? '').toString(),
       actionLabel: 'Read Document',
+      url: json['url']?.toString(),
     );
   }
 }

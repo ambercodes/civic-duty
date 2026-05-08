@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'auth_service.dart';
+
 class ApiClient {
   ApiClient({
     http.Client? httpClient,
@@ -11,7 +13,7 @@ class ApiClient {
        _baseUrl =
            baseUrl ??
            const String.fromEnvironment('API_BASE_URL', defaultValue: '/api'),
-       _tokenProvider = tokenProvider;
+       _tokenProvider = tokenProvider ?? AuthService().idToken;
 
   final http.Client _httpClient;
   final String _baseUrl;

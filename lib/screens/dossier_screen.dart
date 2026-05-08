@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../mock/mock_civic_data.dart';
 import '../models/evidence_item.dart';
 import '../models/dossier.dart';
 import '../routes/app_routes.dart';
@@ -9,23 +8,47 @@ import '../widgets/civic_layout.dart';
 import '../widgets/primary_button.dart';
 
 class DossierScreen extends StatefulWidget {
-  const DossierScreen({super.key});
+  const DossierScreen({
+    super.key,
+    this.dossierIdOrSlug = 'foundational-consent-civic-review',
+  });
+
+  final String dossierIdOrSlug;
 
   @override
   State<DossierScreen> createState() => _DossierScreenState();
 }
 
 class _DossierScreenState extends State<DossierScreen> {
-  late final Future<Dossier> _dossierFuture = DossierService()
-      .getDossier('foundational-consent-civic-review')
-      .catchError((_) => mockDossier);
+  late final Future<Dossier> _dossierFuture = DossierService().getDossier(
+    widget.dossierIdOrSlug,
+  );
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Dossier>(
       future: _dossierFuture,
       builder: (context, snapshot) {
-        final dossier = snapshot.data ?? mockDossier;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CivicLayout(
+            title: 'Loading Dossier',
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          return const CivicLayout(
+            title: 'Dossier Unavailable',
+            child: CivicPanel(
+              children: [
+                Text(
+                  'The dossier could not be loaded from the backend right now.',
+                ),
+              ],
+            ),
+          );
+        }
+
+        final dossier = snapshot.data!;
         return _DossierContent(dossier: dossier);
       },
     );
@@ -118,15 +141,21 @@ class _DossierContent extends StatelessWidget {
                 style: textTheme.bodyMedium,
               ),
               const SizedBox(height: 12),
-              Text(dossier.questions.first, style: textTheme.titleLarge),
+              Text(
+                dossier.questions.isEmpty
+                    ? 'Do you believe this concern warrants structured civic review?'
+                    : dossier.questions.first,
+                style: textTheme.titleLarge,
+              ),
             ],
           ),
           const SizedBox(height: 24),
           PrimaryButton(
             label: 'Confirm Review',
             icon: Icons.check_circle_outline,
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AppRoutes.confirmReview),
+            onPressed: () => Navigator.of(context).pushNamed(
+              '${AppRoutes.confirmReview}/${dossier.slug ?? dossier.id}',
+            ),
           ),
         ],
       ),
@@ -164,7 +193,9 @@ class _EvidenceCard extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      '${item.actionLabel} is a static prototype action.',
+                      item.url == null
+                          ? 'No public source URL is attached yet.'
+                          : 'Opening external evidence is not enabled yet.',
                     ),
                   ),
                 );

@@ -12,6 +12,7 @@ class Dossier {
     required this.publishedDate,
     required this.estimatedReadingMinutes,
     this.slug,
+    this.status = 'published',
     this.provisions = const [],
   });
 
@@ -25,6 +26,7 @@ class Dossier {
   final String version;
   final String publishedDate;
   final int estimatedReadingMinutes;
+  final String status;
   final List<DossierProvision> provisions;
 
   factory Dossier.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,7 @@ class Dossier {
       version: (json['version'] ?? '').toString(),
       publishedDate: (json['publishedAt'] ?? '').toString(),
       estimatedReadingMinutes: 6,
+      status: (json['status'] ?? 'published').toString(),
       provisions: provisions,
     );
   }

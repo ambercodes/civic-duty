@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../routes/app_routes.dart';
+import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 
 class CivicLayout extends StatelessWidget {
@@ -59,9 +60,28 @@ class _RouteMenuButton extends StatelessWidget {
     return PopupMenuButton<String>(
       tooltip: 'Navigate',
       icon: const Icon(Icons.menu),
-      onSelected: (route) => Navigator.of(context).pushNamed(route),
+      onSelected: (route) async {
+        if (route == '_logout') {
+          await AuthService().logout();
+          if (context.mounted) {
+            Navigator.of(context).pushNamed(AppRoutes.landing);
+          }
+          return;
+        }
+        if (context.mounted) {
+          Navigator.of(context).pushNamed(route);
+        }
+      },
       itemBuilder: (context) => const [
         PopupMenuItem(value: AppRoutes.landing, child: Text('Landing')),
+        PopupMenuItem(value: AppRoutes.login, child: Text('Log In')),
+        PopupMenuItem(value: AppRoutes.signup, child: Text('Sign Up')),
+        PopupMenuItem(
+          value: AppRoutes.completeProfile,
+          child: Text('Civic Profile'),
+        ),
+        PopupMenuItem(value: '_logout', child: Text('Log Out')),
+        PopupMenuDivider(),
         PopupMenuItem(value: AppRoutes.dashboard, child: Text('Dashboard')),
         PopupMenuItem(value: AppRoutes.dossier, child: Text('Dossier')),
         PopupMenuItem(value: AppRoutes.confirmReview, child: Text('Confirm')),

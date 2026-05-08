@@ -14,6 +14,7 @@ class CivicDutyApp extends StatelessWidget {
       theme: AppTheme.light,
       initialRoute: AppRoutes.landing,
       routes: AppRoutes.routes,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
     );
   }
 }

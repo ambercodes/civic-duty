@@ -89,6 +89,13 @@ Archive, audit, and transparency:
 Phase 4 should add scripts in a deterministic order, for example:
 
 ```text
+001_phase4_core.sql
+002_phase5_users.sql
+```
+
+Long-term schema expansion may split tables into narrower files:
+
+```text
 001_enums.sql
 002_states.sql
 003_users.sql
