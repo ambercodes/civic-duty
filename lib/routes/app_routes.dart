@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../screens/dashboard_screen.dart';
 import '../screens/dossier_screen.dart';
+import '../screens/education_screen.dart';
 import '../screens/landing_screen.dart';
 import '../screens/ratification_screen.dart';
 import '../screens/read_confirmation_screen.dart';
@@ -16,6 +17,13 @@ class AppRoutes {
   static const confirmReview = '/confirm-review';
   static const ratify = '/ratify';
   static const record = '/record';
+  static const whatIsCivicDuty = '/what-is-civic-duty';
+  static const whatIsADossier = '/what-is-a-dossier';
+  static const ratificationMeaning = '/what-does-ratification-mean';
+  static const verificationLevels = '/verification-levels';
+  static const participationMethodology = '/participation-methodology';
+  static const scopeBoundaries = '/scope-boundaries';
+  static const sandboxDisclaimer = '/sandbox-disclaimer';
 
   static Map<String, WidgetBuilder> get routes {
     return {
@@ -25,6 +33,20 @@ class AppRoutes {
       confirmReview: (_) => const ReadConfirmationScreen(),
       ratify: (_) => const RatificationScreen(),
       record: (_) => const RecordScreen(),
+      whatIsCivicDuty: (_) =>
+          EducationScreen(page: EducationPages.whatIsCivicDuty),
+      whatIsADossier: (_) =>
+          EducationScreen(page: EducationPages.whatIsADossier),
+      ratificationMeaning: (_) =>
+          EducationScreen(page: EducationPages.ratificationMeaning),
+      verificationLevels: (_) =>
+          EducationScreen(page: EducationPages.verificationLevels),
+      participationMethodology: (_) =>
+          EducationScreen(page: EducationPages.participationMethodology),
+      scopeBoundaries: (_) =>
+          EducationScreen(page: EducationPages.scopeBoundaries),
+      sandboxDisclaimer: (_) =>
+          EducationScreen(page: EducationPages.sandboxDisclaimer),
     };
   }
 }

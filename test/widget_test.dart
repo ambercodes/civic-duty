@@ -90,4 +90,32 @@ void main() {
       expect(find.byType(Scaffold), findsOneWidget);
     }
   });
+
+  testWidgets('phase 9 education routes render required headings', (
+    tester,
+  ) async {
+    const expectedHeadings = {
+      AppRoutes.whatIsCivicDuty: 'What Is Civic Duty?',
+      AppRoutes.whatIsADossier: 'What Is a Dossier?',
+      AppRoutes.ratificationMeaning: 'What Does Ratification Mean?',
+      AppRoutes.verificationLevels: 'Verification Levels',
+      AppRoutes.participationMethodology: 'Participation Methodology',
+      AppRoutes.scopeBoundaries: 'Scope Boundaries',
+      AppRoutes.sandboxDisclaimer: 'Sandbox Disclaimer',
+    };
+
+    for (final entry in expectedHeadings.entries) {
+      await tester.pumpWidget(
+        MaterialApp(
+          key: ValueKey(entry.key),
+          routes: AppRoutes.routes,
+          initialRoute: entry.key,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(entry.value), findsOneWidget);
+      expect(find.byType(Scaffold), findsOneWidget);
+    }
+  });
 }

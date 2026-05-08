@@ -67,6 +67,35 @@ class _RouteMenuButton extends StatelessWidget {
         PopupMenuItem(value: AppRoutes.confirmReview, child: Text('Confirm')),
         PopupMenuItem(value: AppRoutes.ratify, child: Text('Ratify')),
         PopupMenuItem(value: AppRoutes.record, child: Text('Record')),
+        PopupMenuDivider(),
+        PopupMenuItem(
+          value: AppRoutes.whatIsCivicDuty,
+          child: Text('What Is Civic Duty?'),
+        ),
+        PopupMenuItem(
+          value: AppRoutes.whatIsADossier,
+          child: Text('What Is a Dossier?'),
+        ),
+        PopupMenuItem(
+          value: AppRoutes.ratificationMeaning,
+          child: Text('Ratification Meaning'),
+        ),
+        PopupMenuItem(
+          value: AppRoutes.verificationLevels,
+          child: Text('Verification Levels'),
+        ),
+        PopupMenuItem(
+          value: AppRoutes.participationMethodology,
+          child: Text('Participation Methodology'),
+        ),
+        PopupMenuItem(
+          value: AppRoutes.scopeBoundaries,
+          child: Text('Scope Boundaries'),
+        ),
+        PopupMenuItem(
+          value: AppRoutes.sandboxDisclaimer,
+          child: Text('Sandbox Disclaimer'),
+        ),
       ],
     );
   }
