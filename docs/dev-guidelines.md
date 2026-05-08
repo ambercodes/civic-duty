@@ -111,3 +111,15 @@ Use clear commit messages:
 - `Create landing screen`
 - `Add civic pulse dashboard placeholder`
 - `Add developer guidelines`
+
+### 11. Treat Verification as Methodology
+
+Verification systems should prioritize:
+
+- privacy minimization
+- methodological transparency
+- backend portability
+- progressive verification layers
+- separation between public visibility and private verification metadata
+
+Verification strength should be disclosed as part of public methodology rather than hidden inside implementation details.

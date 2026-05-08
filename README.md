@@ -115,6 +115,26 @@ The framework is designed to:
 
 Children under 18 are excluded from ratification weight and tracked separately as the future civic body.
 
+## Verification Philosophy
+
+Civic Duty uses verification levels to balance broad civic accessibility with participation confidence.
+
+The purpose of verification is not to erase lower-friction participation. The purpose is to make the participation methodology visible in public records.
+
+Future Civic Ratification Records may include a Participation Verification Summary showing how participation was validated across levels such as:
+
+- self-attested civic participation
+- human verification
+- high assurance verification
+
+The system should minimize unnecessary collection of sensitive personal information and separate public participation visibility from private verification metadata.
+
+See:
+
+```text
+docs/verification-philosophy.md
+```
+
 ## Technology Goals
 
 Civic Duty is designed to remain:
