@@ -16,6 +16,24 @@ The minimal civic flow is:
 Signal -> Review -> Ratify -> Record
 ```
 
+## Live Demo
+
+View the Civic Duty Constitutional Review Sandbox:
+
+```text
+https://civic-duty-sandbox.web.app
+```
+
+The hosted demo is a public static web preview. It does not require Firebase
+access, Neon access, account setup, local installation, or command-line setup.
+It is intended for viewing the interface, public education pages, sample
+dossier, and sample Civic Ratification Record.
+
+The static demo does not persist participation. Backend-connected actions such
+as account profile writes, read confirmation storage, ratification storage, and
+concern submission require the Firebase Functions and Neon backend described in
+the developer setup section.
+
 ## Official Scope
 
 Civic Duty is intended for structured civic review involving foundational constitutional concerns, structural governance questions, delegated authority, civic consent visibility, and measurable constitutional participation.
@@ -141,17 +159,25 @@ Civic Duty Constitutional Review Sandbox is a public civic review demonstration 
 The sandbox does not constitute governmental authority, legal adjudication, binding constitutional interpretation, or official public policy determination.
 ```
 
-## Viewing And Running The Sandbox
+## Developer Setup
 
-The app is a Flutter Web sandbox backed by Firebase Functions and Neon
-PostgreSQL. Public education pages can render without backend data, but the
-civic flow needs the API and database:
+The app is a Flutter Web sandbox designed to run with Firebase Functions and
+Neon PostgreSQL. Public education pages and static demo civic records can
+render without backend data, but live participation needs the API and database:
 
 ```text
 Dashboard -> Dossier -> Read Confirmation -> Ratification -> Civic Ratification Record
 ```
 
+When no API is available, the public Dashboard, Dossier, and Civic Ratification
+Record pages fall back to static sandbox content so a Firebase Hosting demo can
+still be viewed. Write actions such as read confirmation, ratification, account
+profile writes, and concern submission require the backend.
+
 ### Requirements
+
+These steps are only needed for developers who want to fork the project, run it
+locally, or deploy their own backend-connected instance.
 
 Install or create:
 
@@ -339,6 +365,34 @@ curl http://127.0.0.1:5001/your-firebase-project-id/us-central1/api/api/records
 
 ### Deploy Your Fork
 
+#### Static Hosting Demo
+
+Firebase Hosting can serve the public Flutter Web demo without deploying
+Functions. This is useful on Firebase Spark/free projects or when you only want
+people to view the public sandbox interface.
+
+Build Flutter Web with the default `/api` path. If no backend is available, the
+public read pages use static sandbox fallback content.
+
+```sh
+flutter build web \
+  --dart-define=API_BASE_URL=/api \
+  --dart-define=FIREBASE_API_KEY="$FIREBASE_API_KEY" \
+  --dart-define=FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN" \
+  --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" \
+  --dart-define=FIREBASE_STORAGE_BUCKET="$FIREBASE_STORAGE_BUCKET" \
+  --dart-define=FIREBASE_MESSAGING_SENDER_ID="$FIREBASE_MESSAGING_SENDER_ID" \
+  --dart-define=FIREBASE_APP_ID="$FIREBASE_APP_ID"
+```
+
+Deploy Hosting only:
+
+```sh
+firebase deploy --only hosting
+```
+
+#### Backend-Connected Demo
+
 Build Flutter Web for Firebase Hosting:
 
 ```sh
@@ -357,6 +411,10 @@ Deploy Functions and Hosting:
 ```sh
 firebase deploy --only functions,hosting
 ```
+
+Firebase Functions and managed secrets may require the Firebase Blaze plan.
+Without Functions, the hosted app remains a static public demo and does not
+persist participation.
 
 For deeper setup notes, see [Local Development](docs/local-development.md) and
 [Deployment Architecture](docs/deployment-architecture.md).
@@ -377,4 +435,6 @@ Backend providers are implementation layers, not permanent dependencies. Civic l
 
 ## License
 
-License to be added.
+This project is licensed under the GNU Affero General Public License v3.0
+(AGPL-3.0) to preserve transparency, public inspectability, and open civic
+infrastructure in derivative public deployments.
