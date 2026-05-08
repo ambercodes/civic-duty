@@ -49,7 +49,10 @@ type ApiErrorCode =
   "DOSSIER_NOT_FOUND" |
   "CRR_NOT_FOUND" |
   "PROVISION_NOT_FOUND" |
+  "CONCERN_NOT_FOUND" |
+  "SIMILAR_CONCERN_EXISTS" |
   "VALIDATION_FAILED" |
+  "VERIFICATION_LEVEL_REQUIRED" |
   "RATE_LIMITED" |
   "METHOD_NOT_ALLOWED" |
   "SERVER_ERROR";
@@ -129,6 +132,59 @@ type RecordRow = {
   published_at: string;
   dossier_title: string;
 };
+
+type ConcernRow = {
+  id: string;
+  slug: string;
+  title: string;
+  plain_language_summary: string;
+  review_domain: string;
+  issue_statement: string;
+  why_review_matters: string;
+  constitutional_relevance: string;
+  participation_boundaries: string;
+  proposed_review_question: string;
+  external_evidence_url: string | null;
+  creator_verification_level: string;
+  status: string;
+  signal_window_opened_at: string;
+  signal_window_closes_at: string;
+  duplicate_of_concern_id: string | null;
+  created_at: string;
+  signal_count?: number;
+};
+
+type ConcernEvidenceRow = {
+  id: string;
+  title: string;
+  url: string;
+  description: string | null;
+  display_order: number;
+};
+
+type ConcernVariantRow = {
+  id: string;
+  parent_concern_id: string;
+  concern_id: string | null;
+  shared_summary: string;
+  difference_summary: string;
+  evidence_difference: string;
+  review_question_difference: string;
+  provision_language: string;
+  created_at: string;
+};
+
+const officialReviewDomains = new Set([
+  "delegated_authority",
+  "civic_consent_visibility",
+  "separation_of_powers",
+  "constitutional_rights_tension",
+  "public_accountability_transparency",
+  "constitutional_continuity",
+  "emergency_powers",
+  "civic_participation_integrity",
+  "natural_rights_foundational_principles",
+]);
 
 function meta(req: RequestLike): ApiMeta {
   const requestHeader = req.headers["x-request-id"];
@@ -278,6 +334,25 @@ function profileComplete(user: UserRow): boolean {
     user.is_18_plus &&
     !!user.state_code &&
     user.citizenship_attested;
+}
+
+function verificationRank(level: string): number {
+  if (level === "level_3_high_assurance") {
+    return 3;
+  }
+  if (level === "level_2_proof_of_human") {
+    return 2;
+  }
+  return 1;
+}
+
+function slugify(value: string): string {
+  const slug = value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+    .slice(0, 60);
+  return `${slug || "concern"}-${Date.now()}`;
 }
 
 async function protectedUser(
@@ -781,6 +856,447 @@ async function createProvisionResponse(
   sendCreated(response, result.rows[0]);
 }
 
+function serializeConcern(row: ConcernRow) {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    plainLanguageSummary: row.plain_language_summary,
+    reviewDomain: row.review_domain,
+    issueStatement: row.issue_statement,
+    whyReviewMatters: row.why_review_matters,
+    constitutionalRelevance: row.constitutional_relevance,
+    participationBoundaries: row.participation_boundaries,
+    proposedReviewQuestion: row.proposed_review_question,
+    externalEvidenceUrl: row.external_evidence_url,
+    creatorVerificationLevel: row.creator_verification_level,
+    status: row.status,
+    signalWindowOpenedAt: row.signal_window_opened_at,
+    signalWindowClosesAt: row.signal_window_closes_at,
+    duplicateOfConcernId: row.duplicate_of_concern_id,
+    createdAt: row.created_at,
+    signalCount: Number(row.signal_count || 0),
+  };
+}
+
+async function concernByIdOrSlug(idOrSlug: string):
+  Promise<ConcernRow | null> {
+  const result = await pool.query<ConcernRow>(
+    `select foundational_concerns.*,
+       count(concern_signals.id)::int as signal_count
+     from foundational_concerns
+     left join concern_signals
+       on concern_signals.concern_id = foundational_concerns.id
+     where foundational_concerns.id::text = $1
+        or foundational_concerns.slug = $1
+     group by foundational_concerns.id
+     limit 1`,
+    [idOrSlug],
+  );
+  return result.rows[0] || null;
+}
+
+async function serializeConcernDetail(concern: ConcernRow) {
+  const [evidence, variants] = await Promise.all([
+    pool.query<ConcernEvidenceRow>(
+      `select *
+       from concern_evidence
+       where concern_id = $1
+       order by display_order, title`,
+      [concern.id],
+    ),
+    pool.query<ConcernVariantRow>(
+      `select *
+       from concern_variants
+       where parent_concern_id = $1
+       order by created_at desc`,
+      [concern.id],
+    ),
+  ]);
+
+  return {
+    ...serializeConcern(concern),
+    evidence: evidence.rows.map((item) => ({
+      id: item.id,
+      title: item.title,
+      url: item.url,
+      description: item.description,
+      displayOrder: item.display_order,
+    })),
+    variants: variants.rows.map((item) => ({
+      id: item.id,
+      parentConcernId: item.parent_concern_id,
+      concernId: item.concern_id,
+      sharedSummary: item.shared_summary,
+      differenceSummary: item.difference_summary,
+      evidenceDifference: item.evidence_difference,
+      reviewQuestionDifference: item.review_question_difference,
+      provisionLanguage: item.provision_language,
+      createdAt: item.created_at,
+    })),
+  };
+}
+
+async function listConcerns(includeArchive: boolean) {
+  const result = await pool.query<ConcernRow>(
+    `select foundational_concerns.*,
+       count(concern_signals.id)::int as signal_count
+     from foundational_concerns
+     left join concern_signals
+       on concern_signals.concern_id = foundational_concerns.id
+     where (
+         $1::boolean
+         and foundational_concerns.status in (
+           'threshold_not_met',
+           'archived',
+           'duplicate_reference'
+         )
+       )
+        or (
+          not $1::boolean
+          and foundational_concerns.status not in (
+            'threshold_not_met',
+            'archived',
+            'duplicate_reference'
+          )
+        )
+     group by foundational_concerns.id
+     order by foundational_concerns.created_at desc`,
+    [includeArchive],
+  );
+
+  return result.rows.map(serializeConcern);
+}
+
+async function similarConcerns(
+  title: string,
+  summary: string,
+  reviewDomain: string,
+) {
+  const titleToken = title.trim().split(/\s+/)[0] || title;
+  const summaryToken = summary.trim().split(/\s+/)[0] || summary;
+  const result = await pool.query<ConcernRow>(
+    `select foundational_concerns.*,
+       count(concern_signals.id)::int as signal_count
+     from foundational_concerns
+     left join concern_signals
+       on concern_signals.concern_id = foundational_concerns.id
+     where lower(title) = lower($1)
+        or (
+          review_domain = $2
+          and (
+            plain_language_summary ilike $3
+            or title ilike $4
+          )
+        )
+     group by foundational_concerns.id
+     order by foundational_concerns.created_at desc
+     limit 5`,
+    [title, reviewDomain, `%${summaryToken}%`, `%${titleToken}%`],
+  );
+
+  return result.rows.map(serializeConcern);
+}
+
+async function createConcern(request: RequestLike, response: ResponseLike) {
+  const user = await protectedUser(request, true);
+  if (verificationRank(user.verification_level) < 2) {
+    sendError(response, 403, "VERIFICATION_LEVEL_REQUIRED",
+      "Concern creation requires Level 2 proof-of-human verification.");
+    return;
+  }
+
+  const title = bodyValue(request.body, "title");
+  const plainLanguageSummary = bodyValue(request.body, "plainLanguageSummary");
+  const reviewDomain = bodyValue(request.body, "reviewDomain");
+  const issueStatement = bodyValue(request.body, "issueStatement");
+  const whyReviewMatters = bodyValue(request.body, "whyReviewMatters");
+  const constitutionalRelevance =
+    bodyValue(request.body, "constitutionalRelevance");
+  const participationBoundaries =
+    bodyValue(request.body, "participationBoundaries");
+  const proposedReviewQuestion =
+    bodyValue(request.body, "proposedReviewQuestion");
+  const externalEvidenceUrl = bodyValue(request.body, "externalEvidenceUrl");
+  const forceDistinct = bodyValue(request.body, "forceDistinct") === true;
+
+  if (!isString(title) ||
+    !isString(plainLanguageSummary) ||
+    !isString(reviewDomain) ||
+    !officialReviewDomains.has(reviewDomain) ||
+    !isString(issueStatement) ||
+    !isString(whyReviewMatters) ||
+    !isString(constitutionalRelevance) ||
+    !isString(participationBoundaries) ||
+    !isString(proposedReviewQuestion)) {
+    sendError(response, 400, "VALIDATION_FAILED",
+      "All required concern fields and a valid review domain are required.");
+    return;
+  }
+
+  const similar = await similarConcerns(
+    title,
+    plainLanguageSummary,
+    reviewDomain,
+  );
+  if (similar.length > 0 && !forceDistinct) {
+    sendError(response, 409, "SIMILAR_CONCERN_EXISTS",
+      "A similar foundational concern already exists.");
+    return;
+  }
+  const parentConcernId = forceDistinct && similar.length > 0 ?
+    similar[0].id :
+    null;
+
+  const evidence = Array.isArray(bodyValue(request.body, "evidence")) ?
+    bodyValue(request.body, "evidence") as unknown[] :
+    [];
+
+  const client = await pool.connect();
+  try {
+    await client.query("begin");
+    const concernResult = await client.query<ConcernRow>(
+      `insert into foundational_concerns (
+         slug,
+         title,
+         plain_language_summary,
+         review_domain,
+         issue_statement,
+         why_review_matters,
+         constitutional_relevance,
+         participation_boundaries,
+         proposed_review_question,
+         external_evidence_url,
+         creator_user_id,
+         creator_verification_level
+       )
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+       returning *`,
+      [
+        slugify(title),
+        title.trim(),
+        plainLanguageSummary.trim(),
+        reviewDomain,
+        issueStatement.trim(),
+        whyReviewMatters.trim(),
+        constitutionalRelevance.trim(),
+        participationBoundaries.trim(),
+        proposedReviewQuestion.trim(),
+        isString(externalEvidenceUrl) ? externalEvidenceUrl.trim() : null,
+        user.id,
+        user.verification_level,
+      ],
+    );
+    const concern = concernResult.rows[0];
+
+    if (parentConcernId) {
+      await client.query(
+        `insert into concern_variants (
+           parent_concern_id,
+           concern_id,
+           shared_summary,
+           difference_summary,
+           evidence_difference,
+           review_question_difference,
+           provision_language
+         )
+         values ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          parentConcernId,
+          concern.id,
+          plainLanguageSummary.trim(),
+          constitutionalRelevance.trim(),
+          "Submitted as a clearly distinct concern variant.",
+          proposedReviewQuestion.trim(),
+          title.trim(),
+        ],
+      );
+    }
+
+    for (let index = 0; index < evidence.length; index += 1) {
+      const item = evidence[index] as Record<string, unknown>;
+      const evidenceUrl = item.url;
+      if (!isString(evidenceUrl)) {
+        continue;
+      }
+      const evidenceTitle = item.title;
+      const evidenceDescription = item.description;
+      await client.query(
+        `insert into concern_evidence (
+           concern_id,
+           title,
+           url,
+           description,
+           display_order
+         )
+         values ($1, $2, $3, $4, $5)`,
+        [
+          concern.id,
+          isString(evidenceTitle) ?
+            evidenceTitle.trim() :
+            `Evidence ${index + 1}`,
+          evidenceUrl.trim(),
+          isString(evidenceDescription) ?
+            evidenceDescription.trim() :
+            null,
+          index,
+        ],
+      );
+    }
+
+    await client.query(
+      `insert into concern_status_history (
+         concern_id,
+         to_status,
+         reason
+       )
+       values ($1, $2, $3)`,
+      [
+        concern.id,
+        "open_civic_signal",
+        "Immutable pre-dossier submitted for public civic signal.",
+      ],
+    );
+    await client.query("commit");
+    sendCreated(response, {concern: await serializeConcernDetail(concern)});
+  } catch (error) {
+    await client.query("rollback");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+async function createConcernSignal(
+  request: RequestLike,
+  response: ResponseLike,
+  idOrSlug: string,
+) {
+  const user = await protectedUser(request, true);
+  const concern = await concernByIdOrSlug(idOrSlug);
+  if (!concern) {
+    sendError(response, 404, "CONCERN_NOT_FOUND", "Concern was not found.");
+    return;
+  }
+
+  const confirmed = bodyValue(request.body, "confirmedSignalMeaning") === true;
+  const viewedSummary = bodyValue(request.body, "viewedSummary") === true;
+  const viewedScope = bodyValue(request.body, "viewedScope") === true;
+  const viewedEvidence = bodyValue(request.body, "viewedEvidence") === true;
+  if (!confirmed || !viewedSummary || !viewedScope || !viewedEvidence) {
+    sendError(response, 400, "VALIDATION_FAILED",
+      "Summary, scope, evidence, and signal meaning must be confirmed.");
+    return;
+  }
+
+  const result = await pool.query(
+    `insert into concern_signals (
+       user_id,
+       concern_id,
+       state_at_participation,
+       verification_level_at_participation,
+       confirmed_signal_meaning
+     )
+     values ($1, $2, $3, $4, true)
+     on conflict (user_id, concern_id) do nothing
+     returning id, signaled_at`,
+    [user.id, concern.id, user.state_code, user.verification_level],
+  );
+
+  if (result.rowCount === 0) {
+    sendError(response, 409, "DUPLICATE_PARTICIPATION",
+      "You have already signaled support for this concern.");
+    return;
+  }
+
+  await evaluateConcernThreshold(concern.id, true);
+  sendCreated(response, result.rows[0]);
+}
+
+async function evaluateConcernThreshold(
+  concernId: string,
+  updateStatus: boolean,
+) {
+  const result = await pool.query(
+    `select
+       baseline.state_code,
+       baseline.state_name,
+       count(concern_signals.id)::int as participants,
+       baseline.citizen_voting_age_population,
+       case
+         when baseline.citizen_voting_age_population = 0 then 0
+         else count(concern_signals.id)::numeric /
+           baseline.citizen_voting_age_population * 100
+       end as participation_percent
+     from state_population_baselines baseline
+     left join concern_signals
+       on concern_signals.state_at_participation = baseline.state_code
+      and concern_signals.concern_id = $1
+      and concern_signals.signaled_at >= now() - interval '90 days'
+     group by baseline.state_code,
+       baseline.state_name,
+       baseline.citizen_voting_age_population
+     order by baseline.state_code`,
+    [concernId],
+  );
+
+  const statesMeetingThreshold = result.rows
+    .filter((row) => Number(row.participation_percent) >= 0.1)
+    .length;
+  const thresholdMet = statesMeetingThreshold >= 10;
+
+  await pool.query(
+    `insert into threshold_events (
+       concern_id,
+       threshold_name,
+       states_meeting_threshold,
+       required_states,
+       required_percent,
+       signal_window_days,
+       threshold_met,
+       details
+     )
+     values ($1, 'substantial_signal', $2, 10, 0.1000, 90, $3, $4)`,
+    [
+      concernId,
+      statesMeetingThreshold,
+      thresholdMet,
+      JSON.stringify({states: result.rows}),
+    ],
+  );
+
+  if (thresholdMet && updateStatus) {
+    await pool.query(
+      `update foundational_concerns
+       set status = 'official_civic_review'
+       where id = $1
+         and status <> 'official_civic_review'`,
+      [concernId],
+    );
+    await pool.query(
+      `insert into concern_status_history (
+         concern_id,
+         from_status,
+         to_status,
+         reason
+       )
+       values ($1, 'open_civic_signal', 'official_civic_review',
+        'Substantial Signal threshold met across at least 10 states.')`,
+      [concernId],
+    );
+  }
+
+  return {
+    thresholdName: "Substantial Signal",
+    thresholdMet,
+    statesMeetingThreshold,
+    requiredStates: 10,
+    requiredPercent: 0.1,
+    signalWindowDays: 90,
+    states: result.rows,
+  };
+}
+
 export const api = onRequest({cors: true}, async (request, response) => {
   const req = request as RequestLike;
   const res = response as ResponseLike;
@@ -823,6 +1339,65 @@ export const api = onRequest({cors: true}, async (request, response) => {
 
     if (method === "GET" && path === "/records") {
       sendOk(res, {records: await listRecords()});
+      return;
+    }
+
+    if (method === "GET" && path === "/concerns") {
+      sendOk(res, {concerns: await listConcerns(false)});
+      return;
+    }
+
+    if (method === "GET" && path === "/concerns/archive") {
+      sendOk(res, {concerns: await listConcerns(true)});
+      return;
+    }
+
+    if (method === "POST" && path === "/concerns") {
+      await createConcern(req, res);
+      return;
+    }
+
+    const concernVariantsMatch =
+      path.match(/^\/concerns\/([^/]+)\/variants$/);
+    if (method === "GET" && concernVariantsMatch) {
+      const concern = await concernByIdOrSlug(concernVariantsMatch[1]);
+      if (!concern) {
+        sendError(res, 404, "CONCERN_NOT_FOUND", "Concern was not found.");
+        return;
+      }
+      const detail = await serializeConcernDetail(concern);
+      sendOk(res, {variants: detail.variants});
+      return;
+    }
+
+    const concernSignalMatch = path.match(/^\/concerns\/([^/]+)\/signal$/);
+    if (method === "POST" && concernSignalMatch) {
+      await createConcernSignal(req, res, concernSignalMatch[1]);
+      return;
+    }
+
+    const concernThresholdMatch =
+      path.match(/^\/concerns\/([^/]+)\/threshold$/);
+    if (method === "GET" && concernThresholdMatch) {
+      const concern = await concernByIdOrSlug(concernThresholdMatch[1]);
+      if (!concern) {
+        sendError(res, 404, "CONCERN_NOT_FOUND", "Concern was not found.");
+        return;
+      }
+      sendOk(res, {
+        threshold: await evaluateConcernThreshold(concern.id, false),
+      });
+      return;
+    }
+
+    const concernMatch = path.match(/^\/concerns\/([^/]+)$/);
+    if (method === "GET" && concernMatch) {
+      const concern = await concernByIdOrSlug(concernMatch[1]);
+      if (!concern) {
+        sendError(res, 404, "CONCERN_NOT_FOUND", "Concern was not found.");
+        return;
+      }
+      sendOk(res, {concern: await serializeConcernDetail(concern)});
       return;
     }
 

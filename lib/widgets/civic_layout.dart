@@ -88,6 +88,16 @@ class _RouteMenuButton extends StatelessWidget {
         PopupMenuItem(value: AppRoutes.ratify, child: Text('Ratify')),
         PopupMenuItem(value: AppRoutes.record, child: Text('Record')),
         PopupMenuDivider(),
+        PopupMenuItem(value: AppRoutes.concerns, child: Text('Concerns')),
+        PopupMenuItem(
+          value: AppRoutes.submitConcern,
+          child: Text('Submit Concern'),
+        ),
+        PopupMenuItem(
+          value: AppRoutes.concernArchive,
+          child: Text('Concern Archive'),
+        ),
+        PopupMenuDivider(),
         PopupMenuItem(
           value: AppRoutes.whatIsCivicDuty,
           child: Text('What Is Civic Duty?'),

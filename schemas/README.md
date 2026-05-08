@@ -91,6 +91,7 @@ Phase 4 should add scripts in a deterministic order, for example:
 ```text
 001_phase4_core.sql
 002_phase5_users.sql
+003_phase6_concerns.sql
 ```
 
 Long-term schema expansion may split tables into narrower files:

@@ -53,6 +53,7 @@ Run the Phase 4 schema against Neon:
 ```sh
 psql "$NEON_DATABASE_URL" -f schemas/001_phase4_core.sql
 psql "$NEON_DATABASE_URL" -f schemas/002_phase5_users.sql
+psql "$NEON_DATABASE_URL" -f schemas/003_phase6_concerns.sql
 ```
 
 Seed sandbox data:
