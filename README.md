@@ -20,6 +20,10 @@ Signal -> Review -> Ratify -> Record
 
 View the Civic Duty Constitutional Review Sandbox:
 
+<a href="https://civic-duty-sandbox.web.app" target="_blank" rel="noopener noreferrer">Open the live demo</a>
+
+Copyable URL:
+
 ```text
 https://civic-duty-sandbox.web.app
 ```
@@ -265,7 +269,7 @@ node scripts/check_neon_connection.mjs
 Expected output:
 
 ```json
-{"ok":true,"dossierCount":1}
+{ "ok": true, "dossierCount": 1 }
 ```
 
 ### Database Setup
