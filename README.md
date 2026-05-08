@@ -1,45 +1,28 @@
-# Civic Duty - Ratification Process Defined
+# Civic Duty
 
-Civic Duty is an open-source civic measurement framework designed for foundational ratification review.
+Civic Duty is an open-source civic measurement framework for foundational constitutional and structural governance review.
 
 The system provides a structured process for verified participants to:
 
-- signal concern
+- signal foundational civic concern
 - review evidence-based dossiers
 - confirm understanding before participation
-- ratify or reject findings
-- generate a public Civic Ratification Record (CRR)
+- ratify or decline ratification
+- generate public Civic Ratification Records
 
-Civic Duty is intentionally minimal:
+The minimal civic flow is:
 
 ```text
 Signal -> Review -> Ratify -> Record
 ```
 
-The goal is to create a peaceful, measurable, and transparent civic review layer that makes the citizen body visible in relation to foundational consent.
+## Official Scope
 
-## Core Principle
+Civic Duty is intended for structured civic review involving foundational constitutional concerns, structural governance questions, delegated authority, civic consent visibility, and measurable constitutional participation.
 
-Civic Duty exists to make the originating body, the people, visible, measurable, and reviewable in relation to foundational consent.
+The platform is not intended for ordinary partisan disputes, routine legislation, candidate campaigning, or generalized political polling.
 
-The system establishes a structured layer for observing and recording participation at the source level, producing verifiable civic records based on informed participation.
-
-## Why Civic Duty Exists
-
-In the absence of a structured, measurable source of civic participation, public sentiment is often inferred indirectly through:
-
-- polling
-- media interpretation
-- institutional analysis
-- political extrapolation
-
-Civic Duty removes those interpretive layers by creating a direct participation framework built on:
-
-- verified participation
-- structured review
-- read confirmation
-- state-calibrated measurement
-- public auditability
+While the framework may be adaptable to other civic or organizational review systems, the official Civic Duty implementation intentionally limits its scope to foundational constitutional and structural governance review.
 
 ## What Civic Duty Is
 
@@ -49,7 +32,7 @@ Civic Duty is:
 - a structured participation system
 - a public record generator
 - a state-aware civic pulse layer
-- an open-source foundation others may build upon
+- an open-source foundation others may audit, fork, and extend
 
 ## What Civic Duty Is Not
 
@@ -63,158 +46,113 @@ Civic Duty is not:
 - a law enforcement mechanism
 - a replacement government
 
-The system measures and records participation.
-It does not enforce outcomes.
+The system measures and records participation. It does not enforce outcomes.
 
-## System Flow
+## Architecture
 
-```text
-Signal -> Review -> Ratify -> Record
-```
+Architecture docs:
 
-### Signal
+- [Phase 3 Architecture](docs/phase-3-architecture.md)
+- [Verification Philosophy](docs/verification-philosophy.md)
+- [API Routes And Service Layer](docs/api-routes.md)
+- [Security Architecture](docs/security-architecture.md)
+- [Deployment Architecture](docs/deployment-architecture.md)
+- [Database Architecture](docs/database-architecture.md)
+- [Administrative Governance](docs/administrative-governance.md)
+- [Schema Planning](schemas/README.md)
+- [Developer Guidelines](docs/dev-guidelines.md)
 
-Participants indicate that a matter warrants civic review.
+## Verification Model
 
-### Review
+Civic Duty uses three verification levels:
 
-Participants review structured dossiers and supporting evidence.
+- Level 1 = Self-Attested Civic Participation
+- Level 2 = Proof-of-Human Verified
+- Level 3 = High Assurance Verification
 
-### Ratify
+MVP ordinary participation uses Level 1.
 
-Participants confirm understanding and record their position.
-
-### Record
-
-The system generates a Civic Ratification Record (CRR).
-
-## Civic Ratification Record
-
-Each completed review produces a public record containing:
-
-- dossier summary
-- methodology
-- participation metrics
-- state-based participation
-- evidence index
-- ratification outcome
-- timestamp and versioning
-
-The CRR exists to create an auditable artifact of structured civic participation.
-
-## State-Based Civic Pulse
-
-Civic Duty measures participation against state-level population baselines.
-
-The framework is designed to:
-
-- show participation geographically
-- measure state representation
-- provide transparency around civic coverage
-- avoid abstract national extrapolation
-
-Children under 18 are excluded from ratification weight and tracked separately as the future civic body.
-
-## Verification Philosophy
-
-Civic Duty uses verification levels to balance broad civic accessibility with participation confidence.
-
-The purpose of verification is not to erase lower-friction participation. The purpose is to make the participation methodology visible in public records.
-
-Future Civic Ratification Records may include a Participation Verification Summary showing how participation was validated across levels such as:
-
-- self-attested civic participation
-- human verification
-- high assurance verification
-
-The system should minimize unnecessary collection of sensitive personal information and separate public participation visibility from private verification metadata.
-
-See:
+Core rule:
 
 ```text
-docs/verification-philosophy.md
+One participant = one participation.
+Verification level is disclosed, not weighted.
 ```
 
-## Technology Goals
+Concern creators require Level 2 or higher.
 
-Civic Duty is designed to remain:
+## Dossier And Ratification
+
+A dossier is a structured civic review packet that organizes an issue, supporting evidence, contextual explanation, participation boundaries, and review questions into a single readable framework for public examination.
+
+Ratification means:
+
+```text
+I believe this concern warrants structured civic review and formal civic recording based on the evidence presented.
+```
+
+Ratification does not mean a legal ruling, criminal determination, universal agreement, constitutional amendment, or binding governmental action.
+
+## Measurement
+
+Civic Duty measures participation against U.S. citizen population age 18+ using Census CVAP/state-level data.
+
+Participation formula:
+
+```text
+state participation rate = participants from state / state citizen voting-age population
+```
+
+Threshold tiers:
+
+- Emerging Signal = 0.01%
+- Substantial Signal = 0.10%
+- Major Civic Signal = 1.00%
+- Historic Civic Signal = 10.00%
+
+Dossier advancement threshold:
+
+```text
+Substantial Signal across at least 10 states within a 90-day signal window
+```
+
+## Public Sandbox
+
+Public environment:
+
+```text
+Civic Duty Constitutional Review Sandbox
+```
+
+Stack:
+
+- Flutter Web
+- Firebase Hosting
+- Firebase Auth
+- Firebase Functions
+- Neon PostgreSQL
+- GitHub
+
+Sandbox disclaimer:
+
+```text
+Civic Duty Constitutional Review Sandbox is a public civic review demonstration environment intended for constitutional review experimentation, methodology visibility, and participation flow testing.
+The sandbox does not constitute governmental authority, legal adjudication, binding constitutional interpretation, or official public policy determination.
+```
+
+## Development Principles
+
+Civic Duty should remain:
 
 - modular
 - backend portable
-- open-source
-- mobile-first
+- open source
+- mobile first
 - easy to audit
 - easy to fork
 - easy to extend
 
-The system should not become tightly coupled to any single vendor or infrastructure provider.
-
-## Current Stack
-
-Frontend:
-
-- Flutter (Web/PWA first)
-
-Infrastructure:
-
-- Firebase Auth
-- Neon PostgreSQL
-- GitHub
-- Vercel (planned)
-
-## Open Source Philosophy
-
-Civic Duty is intended to serve as a foundational civic measurement framework that others may build upon.
-
-Possible future forks or extensions may include:
-
-- local civic review systems
-- alternative voting systems
-- transparency dashboards
-- research tooling
-- public participation layers
-- civic data analysis tools
-
-## Developer Guidelines
-
-See:
-
-```text
-docs/dev-guidelines.md
-```
-
-## Architectural Principle
-
-Civic Duty should remain infrastructure-portable.
-
-Backend providers are implementation layers, not permanent dependencies.
-
-The civic logic should remain portable between:
-
-- Firebase
-- Neon
-- Supabase
-- self-hosted PostgreSQL
-- alternative identity providers
-
-## Contribution Philosophy
-
-Contributors should prioritize:
-
-- readability
-- modularity
-- composability
-- transparency
-- maintainability
-- auditability
-- calm and neutral interface design
-
-Avoid:
-
-- overengineering
-- social engagement mechanics
-- partisan framing
-- unnecessary complexity
+Backend providers are implementation layers, not permanent dependencies. Civic logic should remain portable between Firebase, Neon, Supabase, self-hosted PostgreSQL, and alternative identity providers.
 
 ## License
 

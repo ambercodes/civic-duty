@@ -1,181 +1,125 @@
 # Civic Participation Verification Philosophy
 
+## Core Rule
+
+One participant = one participation.
+
+Verification level is disclosed, not weighted.
+
+Civic Duty uses verification levels to describe participation confidence, not to multiply civic influence. A Level 3 participant does not count more than a Level 1 participant in ratification, concern signals, provision responses, or threshold calculations.
+
 ## Why Civic Duty Uses Verification Levels
 
-Civic Duty is designed to balance two realities that often conflict within public systems:
+Civic Duty must balance broad civic accessibility with resistance to manipulation. Fully anonymous participation can make public records vulnerable to duplication or automation. Highly invasive identity systems can suppress participation, concentrate sensitive data, and make civic review dependent on a narrow verification provider.
 
-1. Broad civic accessibility
-2. Evidentiary participation confidence
+The platform therefore uses a layered verification model. Each level describes how much confidence the system has in participant uniqueness and eligibility while preserving the same civic unit of measure for every eligible participant.
 
-Many systems choose one extreme:
-
-- fully anonymous participation with little resistance to manipulation,
-- or highly invasive identity systems that discourage participation and centralize sensitive personal data.
-
-Civic Duty intentionally avoids both extremes.
-
-Instead, the platform uses a layered civic verification framework that allows participation while transparently disclosing how participation was verified.
-
-The purpose of verification levels is not to invalidate participation.
-
-The purpose is to make participation methodology visible.
-
-## Core Principle
-
-Verification strength is treated as part of the public methodology rather than a hidden assumption.
-
-This allows the public to better understand:
-
-- how participation was gathered,
-- how eligibility was validated,
-- and how participation confidence may vary across records.
-
-Transparency is prioritized over artificial certainty.
-
-## Participation Accessibility
-
-Civic Duty recognizes that requiring the strongest possible identity verification for all participants may:
-
-- reduce accessibility,
-- discourage participation,
-- increase privacy concerns,
-- and centralize sensitive personal information.
-
-For this reason, the system allows multiple participation verification levels.
-
-This structure supports broader civic participation while still allowing stronger verification methods to emerge over time.
+Verification levels make methodology visible. They do not decide whether a participant's civic position is more important.
 
 ## Verification Levels
 
 ### Level 1 - Self-Attested Civic Participation
 
-This level supports broad accessibility and low-friction participation.
+Level 1 is the MVP participation level.
 
-Participants provide:
+Participants must provide:
 
-- verified account access,
-- state declaration,
-- date of birth entry,
-- 18+ validation,
-- and self-attested U.S. citizenship.
+- verified email
+- date of birth entry
+- 18+ validation
+- state declaration
+- self-attested U.S. citizenship
 
-This level is intended to support foundational public participation while minimizing unnecessary identity collection.
+Level 1 allows broad participation while minimizing identity collection. It is acceptable for MVP ratification, concern signaling, read confirmations, and provision responses.
 
-Verification Strength:
+### Level 2 - Proof-of-Human Verified
 
-```text
-Foundational / Self-Attested
-```
+Level 2 adds proof-of-human or anti-duplication confidence above basic account access and self-attestation.
 
-### Level 2 - Human Verification
+Level 2 may use methods such as privacy-preserving proof-of-human checks, phone verification, anti-bot verification, or other provider-portable human verification systems.
 
-This level introduces stronger participation confidence through additional anti-duplication or proof-of-human systems.
-
-Possible future methods include:
-
-- phone verification,
-- proof-of-human tools,
-- or anti-bot verification systems.
-
-Verification Strength:
-
-```text
-Strengthened Verification
-```
+Concern creators require Level 2 or higher. Only proof-of-human verified users may create new foundational concerns or pre-dossiers.
 
 ### Level 3 - High Assurance Verification
 
-This level supports the strongest participation assurance available within the system.
+Level 3 represents the strongest verification confidence supported by the platform.
 
-Possible future methods include:
+Future methods may include privacy-preserving identity attestations, decentralized identity systems, zero-knowledge eligibility proofs, or third-party high assurance verification providers.
 
-- decentralized identity systems,
-- zero-knowledge proofs,
-- privacy-preserving identity attestations,
-- or third-party identity verification providers.
+Level 3 is disclosed as high assurance participation confidence. It still counts as one participation.
 
-The purpose of this level is to increase evidentiary confidence while preserving participant privacy wherever possible.
+## Disclosed But Not Weighted
 
-Verification Strength:
+Civic Duty discloses verification levels in public methodology summaries because public records should show how participation was gathered. The disclosure helps readers evaluate confidence, coverage, and limits.
 
-```text
-High Assurance Verification
-```
+The disclosure must not become a hidden weighting system. Participation counts, state participation rates, ratification results, concern signals, and provision responses are calculated on a one participant / one participation basis.
 
-## Important Distinction
-
-Civic Duty does not treat lower verification levels as automatically invalid.
-
-Instead, participation verification distribution becomes part of the public record itself.
-
-This allows the public to inspect:
-
-- how participation was gathered,
-- what verification methods were used,
-- and how participation confidence was distributed across the record.
-
-## Participation Confidence Transparency
-
-Each Civic Ratification Record may include a verification distribution summary showing how participation was validated.
-
-Example:
+Public Civic Ratification Records may show verification distribution, for example:
 
 ```text
-Participation Verification Summary
-
-Level 1 - Self-Attested Participants:
-82.4%
-
-Level 2 - Human Verified Participants:
-13.1%
-
-Level 3 - High Assurance Participants:
-4.5%
+Level 1 - Self-Attested Civic Participation: 82.4%
+Level 2 - Proof-of-Human Verified: 13.1%
+Level 3 - High Assurance Verification: 4.5%
 ```
 
-This disclosure exists to provide methodological transparency rather than ideological weighting.
+This is a confidence transparency measure, not an outcome adjustment.
 
-## Privacy Philosophy
+## Privacy Minimization
 
-Civic Duty seeks to minimize unnecessary collection of sensitive personal information.
-
-The system is designed to separate:
-
-- public civic participation visibility
-- from private verification metadata
+Civic Duty should collect the minimum private information needed to support eligibility, uniqueness, security, and auditability.
 
 Public records should not expose:
 
-- legal names,
-- private addresses,
-- full birth dates,
-- or sensitive identifying information.
+- legal names
+- full dates of birth
+- private addresses
+- raw IP addresses
+- raw device fingerprints
+- identity provider secrets
+- sensitive verification documents
 
-Where possible, stronger verification methods should favor privacy-preserving approaches rather than centralized identity storage.
+Where stronger verification is introduced, the preferred approach is to store attestations, timestamps, provider references, and non-reversible hashes instead of raw identity material.
+
+## Public Civic Visibility vs Private Verification Metadata
+
+Civic Duty separates public civic visibility from private verification metadata.
+
+Public civic visibility may include:
+
+- aggregate participation counts
+- state-level participation totals
+- verification level distribution
+- ratification totals
+- provision response totals
+- methodology and threshold rules
+
+Private verification metadata may include:
+
+- Firebase UID
+- verification event records
+- eligibility attestations
+- DOB validation result
+- state declaration history
+- hashed security fingerprints
+- hashed IP rate-limit signals
+- participant flags
+
+Private metadata exists to protect civic integrity and operate the system. It should not be published in Civic Ratification Records or public archive pages.
+
+## Participation Confidence Transparency
+
+Every official Civic Ratification Record should disclose the verification model used for the record, the distribution of participation by verification level, and the known limits of that verification model.
+
+This protects the record from overstating certainty. It also allows later records to improve verification methodology without invalidating earlier Level 1 records.
+
+## MVP Position
+
+The Civic Duty MVP uses Level 1 for ordinary participation.
+
+Level 2 or higher is required for creating foundational concerns or pre-dossiers because concern creation can shape the review agenda. Stronger concern-creator verification protects the pipeline without raising the baseline barrier for ordinary participation.
 
 ## Long-Term Philosophy
 
-Civic Duty is not attempting to create a perfect or infallible civic identity system.
+Civic Duty is not attempting to create a perfect identity system. It is attempting to create an inspectable civic participation framework where eligibility, confidence, and limits are visible.
 
-It is attempting to create a transparent, inspectable, and scalable participation framework where verification methodology remains visible rather than hidden.
-
-The project prioritizes:
-
-- transparency,
-- inspectability,
-- accessibility,
-- participation clarity,
-- and methodological disclosure.
-
-Visibility itself is treated as a foundational component of accountability.
-
-## Civic Ratification Record Methodology
-
-Future Civic Ratification Records should include methodology sections derived from this philosophy.
-
-Recommended sections:
-
-- Participation Verification Summary
-- Verification Methodology
-
-These sections should disclose how participation was validated without exposing private participant identity metadata.
+Verification protects the methodology. It does not replace public judgment, judicial authority, legislative action, or constitutional process.
