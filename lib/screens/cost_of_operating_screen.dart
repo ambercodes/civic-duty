@@ -287,16 +287,37 @@ class _OverviewGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isNarrow = constraints.maxWidth < 720;
-        final tileWidth = isNarrow
-            ? constraints.maxWidth
-            : (constraints.maxWidth - 12) / 2;
 
-        return Wrap(
-          spacing: 12,
-          runSpacing: 12,
+        if (isNarrow) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var index = 0; index < children.length; index++) ...[
+                children[index],
+                if (index != children.length - 1) const SizedBox(height: 12),
+              ],
+            ],
+          );
+        }
+
+        return Column(
           children: [
-            for (final child in children)
-              SizedBox(width: tileWidth, child: child),
+            for (var index = 0; index < children.length; index += 2) ...[
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: children[index]),
+                    const SizedBox(width: 12),
+                    if (index + 1 < children.length)
+                      Expanded(child: children[index + 1])
+                    else
+                      const Expanded(child: SizedBox.shrink()),
+                  ],
+                ),
+              ),
+              if (index + 2 < children.length) const SizedBox(height: 12),
+            ],
           ],
         );
       },
@@ -662,21 +683,82 @@ class CivicComparisonCard extends StatelessWidget {
               Text(article.title, style: textTheme.titleLarge),
               const SizedBox(height: 8),
               Text(article.summary),
-              const SizedBox(height: 10),
-              _ComparisonLine(
-                label: 'Publicly reported cost',
-                value: article.publiclyReportedCost,
+              const SizedBox(height: 12),
+              Text(article.purpose),
+              const SizedBox(height: 18),
+              Text(
+                'Publicly Reported Cost Growth',
+                style: textTheme.titleMedium,
               ),
-              _ComparisonLine(label: 'Timeline', value: article.timeline),
-              _ComparisonLine(
-                label: 'Transparency observations',
-                value: article.transparencyObservations,
+              const SizedBox(height: 10),
+              _ComparisonCostTable(rows: article.costRows),
+              const SizedBox(height: 12),
+              for (final note in article.costGrowthNote) ...[
+                Text(note),
+                const SizedBox(height: 10),
+              ],
+              Text(
+                'What the Software Was Intended to Do',
+                style: textTheme.titleMedium,
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'HealthCare.gov was not merely a public informational website.',
+              ),
+              const SizedBox(height: 10),
+              const Text('The platform was intended to support:'),
+              const SizedBox(height: 8),
+              _BulletList(items: article.intendedToSupport),
+              const SizedBox(height: 10),
+              const Text('This required:'),
+              const SizedBox(height: 8),
+              _BulletList(items: article.requiredComplexity),
+              const SizedBox(height: 14),
+              Text('Public Visibility Concerns', style: textTheme.titleMedium),
+              const SizedBox(height: 10),
+              const Text(
+                'From the perspective of ordinary citizens, much of the project structure was difficult to inspect in real time.',
+              ),
+              const SizedBox(height: 10),
+              const Text('The public generally could not clearly see:'),
+              const SizedBox(height: 8),
+              _BulletList(items: article.publicVisibilityConcerns),
+              const SizedBox(height: 10),
+              const Text('Public reviews later identified:'),
+              const SizedBox(height: 8),
+              _BulletList(items: article.publicReviewsIdentified),
+              const SizedBox(height: 14),
+              Text(
+                'Why This Matters for Civic Duty',
+                style: textTheme.titleMedium,
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Civic Duty uses this comparison to explore a broader public infrastructure question:',
               ),
               const SizedBox(height: 8),
-              Text('Public source links', style: textTheme.titleMedium),
+              Text(article.civicDutyQuestion),
+              const SizedBox(height: 10),
+              const Text(
+                'Civic Duty takes a different approach by making its own structure publicly visible from the beginning through:',
+              ),
+              const SizedBox(height: 8),
+              _BulletList(items: article.civicDutyApproach),
+              const SizedBox(height: 10),
+              for (final note in article.closingNotes) ...[
+                Text(note),
+                const SizedBox(height: 10),
+              ],
+              const SizedBox(height: 8),
+              Text('Works Cited', style: textTheme.titleMedium),
               const SizedBox(height: 6),
-              for (final source in article.sourceLinks)
-                Text('${source.label}: ${source.url}'),
+              for (var index = 0; index < article.sourceLinks.length; index++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    '${index + 1}. ${article.sourceLinks[index].label}\n${article.sourceLinks[index].url}',
+                  ),
+                ),
             ],
           ),
         ),
@@ -685,28 +767,52 @@ class CivicComparisonCard extends StatelessWidget {
   }
 }
 
-class _ComparisonLine extends StatelessWidget {
-  const _ComparisonLine({required this.label, required this.value});
+class _ComparisonCostTable extends StatelessWidget {
+  const _ComparisonCostTable({required this.rows});
 
-  final String label;
-  final String value;
+  final List<ComparisonCostRow> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme.bodyMedium;
+    final headerStyle = textStyle?.copyWith(fontWeight: FontWeight.w700);
+
+    return Table(
+      columnWidths: const {0: FlexColumnWidth(1.4), 1: FlexColumnWidth(1)},
+      border: TableBorder.all(
+        color: Theme.of(context).dividerColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      children: [
+        TableRow(
+          children: [
+            _TableCell('Item', style: headerStyle),
+            _TableCell('Publicly Reported Amount', style: headerStyle),
+          ],
+        ),
+        for (final row in rows)
+          TableRow(
+            children: [
+              _TableCell(row.item, style: textStyle),
+              _TableCell(row.amount, style: textStyle),
+            ],
+          ),
+      ],
+    );
+  }
+}
+
+class _TableCell extends StatelessWidget {
+  const _TableCell(this.text, {this.style});
+
+  final String text;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: RichText(
-        text: TextSpan(
-          style: Theme.of(context).textTheme.bodyMedium,
-          children: [
-            TextSpan(
-              text: '$label: ',
-              style: const TextStyle(fontWeight: FontWeight.w700),
-            ),
-            TextSpan(text: value),
-          ],
-        ),
-      ),
+      padding: const EdgeInsets.all(10),
+      child: Text(text, style: style),
     );
   }
 }

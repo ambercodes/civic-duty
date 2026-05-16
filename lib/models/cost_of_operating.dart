@@ -72,18 +72,39 @@ class CivicComparisonArticle {
   const CivicComparisonArticle({
     required this.title,
     required this.summary,
-    required this.publiclyReportedCost,
-    required this.timeline,
-    required this.transparencyObservations,
+    required this.purpose,
+    required this.costRows,
+    required this.costGrowthNote,
+    required this.intendedToSupport,
+    required this.requiredComplexity,
+    required this.publicVisibilityConcerns,
+    required this.publicReviewsIdentified,
+    required this.civicDutyQuestion,
+    required this.civicDutyApproach,
+    required this.closingNotes,
     required this.sourceLinks,
   });
 
   final String title;
   final String summary;
-  final String publiclyReportedCost;
-  final String timeline;
-  final String transparencyObservations;
+  final String purpose;
+  final List<ComparisonCostRow> costRows;
+  final List<String> costGrowthNote;
+  final List<String> intendedToSupport;
+  final List<String> requiredComplexity;
+  final List<String> publicVisibilityConcerns;
+  final List<String> publicReviewsIdentified;
+  final String civicDutyQuestion;
+  final List<String> civicDutyApproach;
+  final List<String> closingNotes;
   final List<ComparisonSourceLink> sourceLinks;
+}
+
+class ComparisonCostRow {
+  const ComparisonCostRow({required this.item, required this.amount});
+
+  final String item;
+  final String amount;
 }
 
 class ComparisonSourceLink {
