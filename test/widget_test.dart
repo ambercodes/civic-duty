@@ -92,6 +92,8 @@ void main() {
       AppRoutes.participationMethodology: 'Participation Methodology',
       AppRoutes.scopeBoundaries: 'Scope Boundaries',
       AppRoutes.sandboxDisclaimer: 'Sandbox Disclaimer',
+      AppRoutes.costOfOperating:
+          'Cost of Operating Independent Civic Infrastructure',
     };
 
     for (final entry in expectedHeadings.entries) {

@@ -167,6 +167,10 @@ class _RouteMenuButton extends StatelessWidget {
           value: AppRoutes.sandboxDisclaimer,
           child: Text('Sandbox Disclaimer'),
         ),
+        PopupMenuItem(
+          value: AppRoutes.costOfOperating,
+          child: Text('Cost of Operating'),
+        ),
       ],
     );
   }

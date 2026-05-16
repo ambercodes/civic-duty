@@ -9,6 +9,7 @@ import '../screens/concerns/concern_detail_screen.dart';
 import '../screens/concerns/concern_threshold_status_screen.dart';
 import '../screens/concerns/concerns_list_screen.dart';
 import '../screens/concerns/submit_concern_screen.dart';
+import '../screens/cost_of_operating_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/dossier_screen.dart';
 import '../screens/education_screen.dart';
@@ -42,6 +43,7 @@ class AppRoutes {
   static const participationMethodology = '/participation-methodology';
   static const scopeBoundaries = '/scope-boundaries';
   static const sandboxDisclaimer = '/sandbox-disclaimer';
+  static const costOfOperating = '/cost-of-operating';
 
   static Map<String, WidgetBuilder> get routes {
     return {
@@ -76,6 +78,7 @@ class AppRoutes {
           EducationScreen(page: EducationPages.scopeBoundaries),
       sandboxDisclaimer: (_) =>
           EducationScreen(page: EducationPages.sandboxDisclaimer),
+      costOfOperating: (_) => const CostOfOperatingScreen(),
     };
   }
 
